@@ -680,84 +680,23 @@ input[type="text"]:focus {
 }
 
 @media (max-width: 700px) {
-  .bg-video-desktop { display: none; }
-  .bg-video-mobile { display: block; }
-
-  .video-overlay {
-    background:
-      linear-gradient(to bottom, rgba(252,248,245,0.58), rgba(248,241,235,0.74) 28%, rgba(245,238,232,0.84) 64%, rgba(244,237,230,0.92)),
-      linear-gradient(120deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02));
+  .video-shell {
+    position: fixed;
+    inset: 0;
+    min-height: 100dvh;
   }
 
-  .section {
-    width: min(calc(100% - 20px), var(--container));
+  .bg-video {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+
+  .video-glow {
+    display: none;
   }
 
   .hero {
-    padding-top: 42px;
-    padding-bottom: 48px;
-    min-height: 100svh;
-  }
-
-  .hero-copy,
-  .hero-note,
-  .section-heading p,
-  .card-copy,
-  .prose-panel p,
-  .timeline-copy p,
-  .iris-copy p,
-  .iris-bridge span,
-  .hosting-copy p,
-  .hosting-note p,
-  .footer p:last-child {
-    font-size: .98rem;
-    line-height: 1.7;
-  }
-
-  .info-card,
-  .prose-panel,
-  .form-panel,
-  .modal-card,
-  .iris-panel,
-  .timeline-editorial,
-  .hosting-panel {
-    padding: 20px;
-  }
-
-  .fabric-palette {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px 10px;
-  }
-
-  .fabric-swatch small {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.3;
-  }
-
-  .timeline-entry {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 18px 0;
-  }
-
-  .location-photo {
-    min-height: 260px;
-  }
-
-  .iris-visual,
-  .iris-visual img {
-    min-height: 200px;
-  }
-
-  .choice-row-balanced {
-    grid-template-columns: 1fr;
-  }
-
-  .map-button,
-  .submit-button {
-    width: 100%;
-    justify-self: stretch;
+    min-height: 100dvh;
   }
 }
 
