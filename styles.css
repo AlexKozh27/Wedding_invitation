@@ -15,13 +15,24 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+
+html {
+  scroll-behavior: smooth;
+  min-height: 100%;
+  background: var(--bg);
+  overscroll-behavior-y: none;
+}
+
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100%;
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--text);
-  background: radial-gradient(circle at top, rgba(255,255,255,.25), transparent 45%), var(--bg);
+  background:
+    radial-gradient(circle at top, rgba(255,255,255,.25), transparent 45%),
+    var(--bg);
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
 
 body::selection {
@@ -34,9 +45,10 @@ img { max-width: 100%; }
 
 .video-shell {
   position: fixed;
-  inset: 0;
+  inset: -2px;
   overflow: hidden;
   background: #f1e6dd;
+  min-height: 100dvh;
 }
 
 .bg-video {
