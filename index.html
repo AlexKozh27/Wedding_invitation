@@ -299,9 +299,9 @@
     </div>
   </div>
 
-  <script>
+    <script>
+    const videoShell = document.querySelector('.video-shell');
     const bgVideo = document.getElementById('bgVideo');
-    const bgVideoSource = document.getElementById('bgVideoSource');
 
     const mediaConfig = {
       desktop: {
@@ -309,39 +309,33 @@
         poster: './background/wedding-background-poster-desktop.jpg'
       },
       mobile: {
-        src: './background/wedding-background-loop-mobile-fixed.mp4',
-        poster: './background/wedding-background-poster-mobile-fixed.jpg',
-        fallbackSrc: './background/wedding-background-loop.mp4',
-        fallbackPoster: './background/wedding-background-poster-desktop.jpg'
+        src: './background/wedding-background-loop-mobile.mp4',
+        poster: './background/wedding-background-poster-mobile.jpg'
       }
     };
 
     let activeMode = '';
-    let hasTriedMobileFallback = false;
 
     function getBackgroundMode() {
       return window.matchMedia('(max-width: 700px)').matches ? 'mobile' : 'desktop';
     }
 
-    async function ensureBackgroundVideo(forceReload = false) {
+    async function applyBackgroundMedia() {
       const mode = getBackgroundMode();
-      const config = mediaConfig[mode];
-      const shouldReload = forceReload || mode !== activeMode || bgVideoSource.getAttribute('src') !== config.src;
+      if (mode === activeMode) return;
 
       activeMode = mode;
+      const { src, poster } = mediaConfig[mode];
 
-      bgVideo.muted = true;
-      bgVideo.defaultMuted = true;
-      bgVideo.playsInline = true;
-      bgVideo.setAttribute('muted', '');
-      bgVideo.setAttribute('playsinline', '');
-      bgVideo.setAttribute('webkit-playsinline', 'true');
+      videoShell.classList.remove('is-video-ready');
 
-      if (shouldReload) {
-        bgVideo.poster = config.poster;
-        bgVideoSource.src = config.src;
-        bgVideo.load();
-      }
+      bgVideo.pause();
+      bgVideo.removeAttribute('src');
+      bgVideo.load();
+
+      bgVideo.poster = poster;
+      bgVideo.src = src;
+      bgVideo.load();
 
       try {
         await bgVideo.play();
@@ -350,8 +344,8 @@
       }
     }
 
-    bgVideo.addEventListener('loadeddata', () => {
-      bgVideo.play().catch(() => {});
+    bgVideo.addEventListener('playing', () => {
+      videoShell.classList.add('is-video-ready');
     });
 
     bgVideo.addEventListener('canplay', () => {
@@ -359,31 +353,21 @@
     });
 
     bgVideo.addEventListener('error', () => {
-      if (getBackgroundMode() === 'mobile' && !hasTriedMobileFallback) {
-        hasTriedMobileFallback = true;
-        const fallback = mediaConfig.mobile;
-        bgVideo.poster = fallback.fallbackPoster;
-        bgVideoSource.src = fallback.fallbackSrc;
-        bgVideo.load();
+      videoShell.classList.remove('is-video-ready');
+    });
+
+    window.addEventListener('load', applyBackgroundMedia);
+    window.addEventListener('resize', applyBackgroundMedia, { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
         bgVideo.play().catch(() => {});
       }
     });
 
-    window.addEventListener('load', () => ensureBackgroundVideo(true));
-    window.addEventListener('pageshow', () => ensureBackgroundVideo(true));
-    window.addEventListener('resize', () => ensureBackgroundVideo(), { passive: true });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        ensureBackgroundVideo();
-      }
-    });
-
-    ['touchstart', 'pointerdown'].forEach((eventName) => {
-      document.addEventListener(eventName, () => {
-        ensureBackgroundVideo();
-      }, { passive: true, once: true });
-    });
+    document.addEventListener('touchstart', () => {
+      bgVideo.play().catch(() => {});
+    }, { passive: true, once: true });
 
     function applyChoiceClasses() {
       const yesBtn = document.getElementById('attendYes');
