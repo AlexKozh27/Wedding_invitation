@@ -124,7 +124,7 @@ img { max-width: 100%; }
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 14px;
+  gap: 12px;
   padding: 64px 0 72px;
 }
 
@@ -141,7 +141,9 @@ img { max-width: 100%; }
 .section-heading h2,
 .prose-panel h2,
 .iris-copy h2,
-.hosting-copy h2 {
+.hosting-copy h2,
+.contacts-copy h2,
+.seating-panel h2 {
   margin: 0;
   font-family: 'Playfair Display', Georgia, serif;
   line-height: 1.02;
@@ -151,10 +153,30 @@ img { max-width: 100%; }
   font-size: clamp(3.2rem, 8vw, 6.6rem);
 }
 
-.hero-date {
-  letter-spacing: .28em;
+.hero-label {
+  letter-spacing: .24em;
   font-size: 11px;
-  color: rgba(85, 64, 55, 0.76);
+  color: rgba(85, 64, 55, 0.74);
+}
+
+.hero-date {
+  letter-spacing: .24em;
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
+  color: rgba(85, 64, 55, 0.82);
+}
+
+.hero-names {
+  display: grid;
+  gap: 2px;
+}
+
+.hero-names span {
+  display: block;
+}
+
+.hero-ampersand {
+  font-size: .72em;
+  line-height: .9;
 }
 
 .hero-subtitle {
@@ -193,14 +215,18 @@ main {
 .section-heading h2,
 .prose-panel h2,
 .iris-copy h2,
-.hosting-copy h2 {
+.hosting-copy h2,
+.contacts-copy h2,
+.seating-panel h2 {
   font-size: clamp(2rem, 4vw, 3.3rem);
   margin-top: 8px;
   margin-bottom: 0;
 }
 
 .iris-copy h2,
-.hosting-copy h2 {
+.hosting-copy h2,
+.contacts-copy h2,
+.seating-panel h2 {
   margin-bottom: 16px;
 }
 
@@ -224,7 +250,10 @@ main {
 .prose-panel p,
 .iris-copy p,
 .hosting-copy p,
-.hosting-note p {
+.hosting-note p,
+.contacts-copy p,
+.contacts-chat p,
+.seating-panel p {
   margin: 0 0 14px;
   color: var(--muted);
 }
@@ -233,7 +262,10 @@ main {
 .prose-panel p:last-child,
 .iris-copy p:last-child,
 .hosting-copy p:last-child,
-.hosting-note p:last-child {
+.hosting-note p:last-child,
+.contacts-copy p:last-child,
+.contacts-chat p:last-child,
+.seating-panel p:last-child {
   margin-bottom: 0;
 }
 
@@ -437,16 +469,20 @@ main {
   gap: 0;
 }
 
+.timeline-kicker {
+  margin-bottom: 10px;
+}
+
 .timeline-entry {
   display: grid;
-  grid-template-columns: 132px 1fr;
-  gap: 18px;
+  grid-template-columns: 116px 1fr;
+  gap: 0;
   padding: 22px 0;
   border-bottom: 1px solid rgba(103, 77, 64, 0.12);
 }
 
 .timeline-entry:first-child {
-  padding-top: 4px;
+  padding-top: 8px;
 }
 
 .timeline-entry:last-child {
@@ -461,6 +497,11 @@ main {
   line-height: .95;
   color: #8d5b49;
   letter-spacing: -.02em;
+}
+
+.timeline-copy {
+  border-left: 1px solid rgba(103, 77, 64, 0.18);
+  padding-left: 22px;
 }
 
 .timeline-copy h3 {
@@ -708,6 +749,31 @@ input[type="text"]:focus {
     display: none;
   }
 
+  .hero {
+    gap: 10px;
+    padding: 54px 0 64px;
+  }
+
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: .2em;
+  }
+
+  .hero-date {
+    font-size: 1.12rem;
+    letter-spacing: .18em;
+  }
+
+  .hero h1 {
+    font-size: clamp(3.5rem, 16vw, 5rem);
+    line-height: .9;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1.05rem, 5.6vw, 1.45rem);
+    line-height: 1.45;
+  }
+
   .fabric-palette {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px 10px;
@@ -732,6 +798,29 @@ input[type="text"]:focus {
     display: grid;
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+
+  .contacts-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .contacts-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .submit-button-chat {
+    width: 100%;
+    justify-self: stretch;
+    text-align: center;
+  }
+
+  .timeline-entry {
+    grid-template-columns: 92px 1fr;
+  }
+
+  .timeline-copy {
+    padding-left: 16px;
   }
 
   .iris-copy .section-kicker {
@@ -783,3 +872,55 @@ input[type="text"]:focus {
       linear-gradient(120deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
 }
+
+
+.hosting-title {
+  font-size: clamp(1.75rem, 3vw, 2.55rem) !important;
+}
+
+.contacts-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) 1px minmax(0, .95fr);
+  gap: 22px;
+  align-items: stretch;
+  padding: 28px;
+}
+
+.contacts-copy,
+.contacts-chat,
+.seating-panel {
+  display: grid;
+  align-content: start;
+}
+
+.contacts-person {
+  margin-top: 8px;
+}
+
+.contacts-person a {
+  text-decoration: none;
+}
+
+.contacts-divider {
+  width: 1px;
+  background: rgba(103, 77, 64, 0.12);
+  border-radius: 999px;
+}
+
+.submit-button-chat {
+  width: fit-content;
+  min-width: 210px;
+  justify-self: start;
+  text-decoration: none;
+}
+
+.seating-panel {
+  gap: 10px;
+  padding: 28px;
+}
+
+.seating-panel h2 {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
