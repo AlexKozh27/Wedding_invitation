@@ -755,8 +755,8 @@ input[type="text"]:focus {
   }
 
   .hero-label {
-    font-size: 10px;
-    letter-spacing: .2em;
+    font-size: 14px;
+    letter-spacing: .18em;
   }
 
   .hero-date {
@@ -844,8 +844,12 @@ input[type="text"]:focus {
     order: 5;
   }
 
-  .iris-bridge {
+  .iris-copy p:nth-of-type(3) {
     order: 6;
+  }
+
+  .iris-bridge {
+    order: 7;
     margin-top: 0;
   }
 
@@ -928,21 +932,25 @@ input[type="text"]:focus {
 
 /* v5 refinements */
 .intro-panel {
+  width: 100%;
+  max-width: 100%;
   padding: 30px 34px;
   text-align: center;
-  max-width: 860px;
   margin-inline: auto;
 }
 
 .intro-lead {
   margin: 0 0 14px;
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-weight: 700;
   color: rgba(70, 50, 42, 0.92);
 }
 
 .intro-panel p {
   margin: 0;
+  max-width: 780px;
+  margin-inline: auto;
   color: var(--muted);
   line-height: 1.9;
   font-size: clamp(1rem, 1.45vw, 1.08rem);
