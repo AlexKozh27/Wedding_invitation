@@ -731,6 +731,46 @@ input[type="text"]:focus {
     font-size: 11px;
     line-height: 1.15;
   }
+
+  .iris-copy {
+    display: contents;
+  }
+
+  .iris-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .iris-copy .section-kicker {
+    order: 1;
+  }
+
+  .iris-copy h2 {
+    order: 2;
+  }
+
+  .iris-copy p:first-of-type {
+    order: 3;
+  }
+
+  .iris-visual {
+    order: 4;
+    min-height: 220px;
+  }
+
+  .iris-copy p:nth-of-type(2) {
+    order: 5;
+  }
+
+  .iris-bridge {
+    order: 6;
+    margin-top: 0;
+  }
+
+  .iris-visual img {
+    min-height: 220px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
