@@ -45,31 +45,51 @@ img { max-width: 100%; }
 
 .video-shell {
   position: fixed;
-  inset: -2px;
+  inset: 0;
   overflow: hidden;
   background: #f1e6dd;
-  min-height: 100dvh;
+  min-height: 100svh;
+  height: 100svh;
+}
+
+.video-fallback,
+.bg-video,
+.video-overlay,
+.video-glow {
+  position: absolute;
+  inset: 0;
+}
+
+.video-fallback {
+  z-index: 0;
+  background-image: url('./background/wedding-background-poster-desktop.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .bg-video {
-  position: absolute;
-  inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
+  opacity: 0;
+  transition: opacity .35s ease;
 }
 
-.bg-video-mobile { display: none; }
+.video-shell.is-video-ready .bg-video {
+  opacity: 1;
+}
+
 .video-overlay {
-  position: absolute;
-  inset: 0;
+  z-index: 2;
   background:
     linear-gradient(to bottom, rgba(252,248,245,0.24), rgba(248,241,235,0.34) 30%, rgba(245,238,232,0.48) 70%, rgba(244,237,230,0.60)),
     linear-gradient(120deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02));
 }
 .video-glow {
-  position: absolute;
+  z-index: 3;
   left: 50%;
   transform: translateX(-50%);
   width: min(1100px, 100vw);
@@ -669,26 +689,23 @@ input[type="text"]:focus {
 }
 
 @media (max-width: 700px) {
-  .video-shell {
-    position: fixed;
-    inset: 0;
-    min-height: 100dvh;
+  .video-shell,
+  .hero {
+    min-height: 100svh;
+    height: 100svh;
   }
 
-  .bg-video-desktop { display: none; }
-  .bg-video-mobile { display: block; }
+  .video-fallback {
+    background-image: url('./background/wedding-background-poster-mobile-fixed.jpg');
+    background-position: center center;
+  }
 
   .bg-video {
-    min-height: 100dvh;
-    height: 100dvh;
+    object-position: center center;
   }
 
   .video-glow {
     display: none;
-  }
-
-  .hero {
-    min-height: 100dvh;
   }
 
   .fabric-palette {

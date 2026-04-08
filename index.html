@@ -14,12 +14,21 @@
 </head>
 <body>
   <div class="video-shell" aria-hidden="true">
-    <video class="bg-video bg-video-desktop" autoplay muted loop playsinline webkit-playsinline="true" preload="auto" disablepictureinpicture poster="./background/wedding-background-poster-desktop.jpg">
-      <source src="./background/wedding-background-loop.mp4" type="video/mp4">
+    <div class="video-fallback"></div>
+
+    <video
+      id="bgVideo"
+      class="bg-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      webkit-playsinline="true"
+      preload="auto"
+      disablepictureinpicture
+      poster="./background/wedding-background-poster-desktop.jpg">
     </video>
-    <video class="bg-video bg-video-mobile" autoplay muted loop playsinline webkit-playsinline="true" preload="auto" disablepictureinpicture poster="./background/wedding-background-poster-mobile.jpg">
-      <source src="./background/wedding-background-loop-mobile.mp4" type="video/mp4">
-    </video>
+
     <div class="video-overlay"></div>
     <div class="video-glow video-glow-top"></div>
     <div class="video-glow video-glow-bottom"></div>
@@ -253,43 +262,74 @@
   </div>
 
   <script>
-    const bgVideos = document.querySelectorAll('.bg-video');
+    const videoShell = document.querySelector('.video-shell');
+    const bgVideo = document.getElementById('bgVideo');
 
-    async function tryPlayBackgroundVideo(video) {
-      if (!video) return;
+    const mediaConfig = {
+      desktop: {
+        src: './background/wedding-background-loop.mp4',
+        poster: './background/wedding-background-poster-desktop.jpg'
+      },
+      mobile: {
+        src: './background/wedding-background-loop-mobile.mp4',
+        poster: './background/wedding-background-poster-mobile.jpg'
+      }
+    };
 
-      video.muted = true;
-      video.setAttribute('muted', '');
-      video.setAttribute('playsinline', '');
-      video.setAttribute('webkit-playsinline', 'true');
-      video.playsInline = true;
+    let activeMode = '';
+
+    function getBackgroundMode() {
+      return window.matchMedia('(max-width: 700px)').matches ? 'mobile' : 'desktop';
+    }
+
+    async function applyBackgroundMedia() {
+      const mode = getBackgroundMode();
+      if (mode === activeMode) return;
+
+      activeMode = mode;
+      const { src, poster } = mediaConfig[mode];
+
+      videoShell.classList.remove('is-video-ready');
+
+      bgVideo.pause();
+      bgVideo.removeAttribute('src');
+      bgVideo.load();
+
+      bgVideo.poster = poster;
+      bgVideo.src = src;
+      bgVideo.load();
 
       try {
-        await video.play();
+        await bgVideo.play();
       } catch (error) {
         console.debug('Background video autoplay was blocked:', error);
       }
     }
 
-    function replayVisibleBackgroundVideo() {
-      bgVideos.forEach((video) => {
-        const isMobileVideo = video.classList.contains('bg-video-mobile');
-        const shouldBeVisible = window.innerWidth <= 700 ? isMobileVideo : !isMobileVideo;
-
-        if (shouldBeVisible) {
-          tryPlayBackgroundVideo(video);
-        } else {
-          video.pause();
-        }
-      });
-    }
-
-    window.addEventListener('load', replayVisibleBackgroundVideo);
-    window.addEventListener('resize', replayVisibleBackgroundVideo, { passive: true });
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) replayVisibleBackgroundVideo();
+    bgVideo.addEventListener('playing', () => {
+      videoShell.classList.add('is-video-ready');
     });
-    document.addEventListener('touchstart', replayVisibleBackgroundVideo, { passive: true, once: true });
+
+    bgVideo.addEventListener('canplay', () => {
+      bgVideo.play().catch(() => {});
+    });
+
+    bgVideo.addEventListener('error', () => {
+      videoShell.classList.remove('is-video-ready');
+    });
+
+    window.addEventListener('load', applyBackgroundMedia);
+    window.addEventListener('resize', applyBackgroundMedia, { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        bgVideo.play().catch(() => {});
+      }
+    });
+
+    document.addEventListener('touchstart', () => {
+      bgVideo.play().catch(() => {});
+    }, { passive: true, once: true });
 
     function applyChoiceClasses() {
       const yesBtn = document.getElementById('attendYes');
