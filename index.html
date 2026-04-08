@@ -24,9 +24,10 @@
       loop
       playsinline
       webkit-playsinline="true"
-      preload="auto"
+      preload="metadata"
       disablepictureinpicture
       poster="./background/wedding-background-poster-desktop.jpg">
+      <source id="bgVideoSource" src="./background/wedding-background-loop.mp4" type="video/mp4">
     </video>
 
     <div class="video-overlay"></div>
@@ -47,16 +48,25 @@
     </header>
 
     <main>
+      <section class="section intro-section">
+        <div class="glass soft-panel intro-panel">
+          <p class="intro-lead">Дорогие родные и близкие!</p>
+          <p>Настал день, о котором мы так долго мечтали…<br>В окружении тепла, нежности и самых искренних чувств<br>мы собираем рядом самых близких людей.</p>
+          <p>И с большой радостью приглашаем вас на нашу свадьбу.<br>Нам особенно хочется разделить этот момент с вами —<br>будет очень важно и ценно прожить этот день вместе.</p>
+        </div>
+      </section>
+
       <section class="section iris-section iris-section-lead">
         <div class="glass soft-panel iris-panel iris-panel-lead">
           <div class="iris-copy">
             <span class="section-kicker">О нас</span>
-            <h2>Взгляд, в котором — мы</h2>
-            <p>В этой детали нам хотелось сохранить что-то очень личное — взгляд, который узнаёт, поддерживает и остаётся рядом.</p>
-            <p>С него и начинается история нашего дня: лёгкая, красивая и очень живая.</p>
+            <h2>Два взгляда. Одна история всегда и навечно.</h2>
+            <p>Когда-то всё началось с одного взгляда —<br>и оказалось, что это навсегда.</p>
+            <p>С тех пор мы рядом в каждом дне:<br>в разговорах, в дороге друг к другу, в поддержке и в тишине.</p>
+            <p>Мы — это дом друг для друга.<br>И так будет всегда.</p>
 
             <div class="iris-bridge">
-              <span>А ниже — детали нашего дня, собранные с той же любовью.</span>
+              <span>А ниже — детали нашего дня, собранные с любовью и вниманием к каждому.</span>
             </div>
           </div>
 
@@ -236,9 +246,9 @@
 
       <section class="section seating-section">
         <div class="glass soft-panel seating-panel">
-          <span class="section-kicker">План зала</span>
+          <span class="section-kicker">План рассадки</span>
           <h2>Рассадка гостей</h2>
-          <p>Позже здесь появится план рассадки гостей.</p>
+          <p>Мы с заботой продумываем рассадку, чтобы каждому было комфортно и уютно. Каждому гостю мы обязательно найдём своё особенное место — информация о рассадке появится здесь же ближе к дате свадьбы.</p>
         </div>
       </section>
 
@@ -290,8 +300,8 @@
   </div>
 
   <script>
-    const videoShell = document.querySelector('.video-shell');
     const bgVideo = document.getElementById('bgVideo');
+    const bgVideoSource = document.getElementById('bgVideoSource');
 
     const mediaConfig = {
       desktop: {
@@ -300,32 +310,38 @@
       },
       mobile: {
         src: './background/wedding-background-loop-mobile-fixed.mp4',
-        poster: './background/wedding-background-poster-mobile-fixed.jpg'
+        poster: './background/wedding-background-poster-mobile-fixed.jpg',
+        fallbackSrc: './background/wedding-background-loop.mp4',
+        fallbackPoster: './background/wedding-background-poster-desktop.jpg'
       }
     };
 
     let activeMode = '';
+    let hasTriedMobileFallback = false;
 
     function getBackgroundMode() {
       return window.matchMedia('(max-width: 700px)').matches ? 'mobile' : 'desktop';
     }
 
-    async function applyBackgroundMedia() {
+    async function ensureBackgroundVideo(forceReload = false) {
       const mode = getBackgroundMode();
-      if (mode === activeMode) return;
+      const config = mediaConfig[mode];
+      const shouldReload = forceReload || mode !== activeMode || bgVideoSource.getAttribute('src') !== config.src;
 
       activeMode = mode;
-      const { src, poster } = mediaConfig[mode];
 
-      videoShell.classList.remove('is-video-ready');
+      bgVideo.muted = true;
+      bgVideo.defaultMuted = true;
+      bgVideo.playsInline = true;
+      bgVideo.setAttribute('muted', '');
+      bgVideo.setAttribute('playsinline', '');
+      bgVideo.setAttribute('webkit-playsinline', 'true');
 
-      bgVideo.pause();
-      bgVideo.removeAttribute('src');
-      bgVideo.load();
-
-      bgVideo.poster = poster;
-      bgVideo.src = src;
-      bgVideo.load();
+      if (shouldReload) {
+        bgVideo.poster = config.poster;
+        bgVideoSource.src = config.src;
+        bgVideo.load();
+      }
 
       try {
         await bgVideo.play();
@@ -334,8 +350,8 @@
       }
     }
 
-    bgVideo.addEventListener('playing', () => {
-      videoShell.classList.add('is-video-ready');
+    bgVideo.addEventListener('loadeddata', () => {
+      bgVideo.play().catch(() => {});
     });
 
     bgVideo.addEventListener('canplay', () => {
@@ -343,21 +359,31 @@
     });
 
     bgVideo.addEventListener('error', () => {
-      videoShell.classList.remove('is-video-ready');
-    });
-
-    window.addEventListener('load', applyBackgroundMedia);
-    window.addEventListener('resize', applyBackgroundMedia, { passive: true });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
+      if (getBackgroundMode() === 'mobile' && !hasTriedMobileFallback) {
+        hasTriedMobileFallback = true;
+        const fallback = mediaConfig.mobile;
+        bgVideo.poster = fallback.fallbackPoster;
+        bgVideoSource.src = fallback.fallbackSrc;
+        bgVideo.load();
         bgVideo.play().catch(() => {});
       }
     });
 
-    document.addEventListener('touchstart', () => {
-      bgVideo.play().catch(() => {});
-    }, { passive: true, once: true });
+    window.addEventListener('load', () => ensureBackgroundVideo(true));
+    window.addEventListener('pageshow', () => ensureBackgroundVideo(true));
+    window.addEventListener('resize', () => ensureBackgroundVideo(), { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        ensureBackgroundVideo();
+      }
+    });
+
+    ['touchstart', 'pointerdown'].forEach((eventName) => {
+      document.addEventListener(eventName, () => {
+        ensureBackgroundVideo();
+      }, { passive: true, once: true });
+    });
 
     function applyChoiceClasses() {
       const yesBtn = document.getElementById('attendYes');
