@@ -1066,3 +1066,26 @@ input[type="text"]:focus {
     padding: 24px 20px;
   }
 }
+
+
+/* ==== invitation text fixes ==== */
+.hero-label {
+  position: relative;
+  top: -14px;
+}
+
+.intro-panel .intro-lead {
+  font-size: clamp(2rem, 3.6vw, 2.75rem) !important;
+  line-height: 1.15;
+}
+
+@media (max-width: 700px) {
+  .hero-label {
+    top: -10px;
+  }
+
+  .hosting-copy .hosting-title {
+    font-size: clamp(1.45rem, 6vw, 1.9rem) !important;
+    line-height: 1.2;
+  }
+}
