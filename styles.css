@@ -882,6 +882,10 @@ input[type="text"]:focus {
   font-size: clamp(1.75rem, 3.2vw, 2.55rem) !important;
 }
 
+.contacts-title {
+  font-size: clamp(1.75rem, 3.2vw, 2.55rem) !important;
+}
+
 .contacts-panel {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) 1px minmax(0, .95fr);
