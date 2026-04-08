@@ -1075,7 +1075,7 @@ input[type="text"]:focus {
 }
 
 .intro-panel .intro-lead {
-  font-size: clamp(2rem, 3.6vw, 2.75rem) !important;
+  font-size: clamp(1.6rem, 3vw, 2.3rem) !important;
   line-height: 1.15;
 }
 
@@ -1088,4 +1088,10 @@ input[type="text"]:focus {
     font-size: clamp(1.45rem, 6vw, 1.9rem) !important;
     line-height: 1.2;
   }
+
+  .contacts-copy .contacts-title {
+    font-size: clamp(1.45rem, 6vw, 1.9rem) !important;
+    line-height: 1.2;
+  }
+
 }
