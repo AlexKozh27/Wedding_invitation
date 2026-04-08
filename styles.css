@@ -155,7 +155,7 @@ img { max-width: 100%; }
 
 .hero-label {
   letter-spacing: .24em;
-  font-size: 11px;
+  font-size: 23px;
   color: rgba(85, 64, 55, 0.74);
 }
 
@@ -924,3 +924,130 @@ input[type="text"]:focus {
   margin-bottom: 0;
 }
 
+
+
+/* v4 cosmetic refinements */
+.hero {
+  gap: 0;
+}
+
+.hero-label {
+  margin-bottom: 18px;
+  transform: translateY(-18px);
+}
+
+.hero-date {
+  margin-bottom: 24px;
+  font-size: clamp(1.16rem, 2.2vw, 1.62rem);
+}
+
+.iris-copy h2 {
+  font-size: clamp(1.28rem, 2.15vw, 2rem);
+  line-height: 1.12;
+  max-width: 12ch;
+}
+
+.contacts-copy h2 {
+  font-size: clamp(1.22rem, 1.9vw, 1.68rem);
+  line-height: 1.14;
+  margin-bottom: 12px;
+}
+
+.timeline-copy {
+  position: relative;
+  border-left: 0;
+  padding-left: 26px;
+}
+
+.timeline-copy::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(141, 91, 73, 0.82), rgba(141, 91, 73, 0.42));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.hosting-title {
+  font-size: clamp(1.2rem, 2.1vw, 1.7rem) !important;
+  line-height: 1.16;
+  max-width: 18ch;
+}
+
+.contacts-chat {
+  gap: 18px;
+  justify-items: center;
+  text-align: center;
+}
+
+.submit-button-chat {
+  justify-self: center;
+}
+
+.seating-panel h2 {
+  font-size: clamp(1.2rem, 2vw, 1.68rem);
+  line-height: 1.14;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .hero-label {
+    margin-bottom: 14px;
+    transform: translateY(-12px);
+  }
+
+  .hero-date {
+    margin-bottom: 22px;
+    font-size: 1.28rem;
+    letter-spacing: .2em;
+  }
+
+  .iris-copy h2 {
+    font-size: clamp(1.22rem, 6vw, 1.75rem);
+    max-width: none;
+  }
+
+  .contacts-copy h2,
+  .seating-panel h2 {
+    font-size: clamp(1.12rem, 5.2vw, 1.45rem);
+  }
+
+  .timeline-copy {
+    padding-left: 18px;
+  }
+
+  .timeline-copy::before {
+    width: 2px;
+    top: 1px;
+    bottom: 1px;
+  }
+
+  .hosting-title {
+    font-size: clamp(1.06rem, 4.8vw, 1.34rem) !important;
+  }
+
+  .contacts-panel {
+    gap: 18px;
+  }
+
+  .contacts-copy,
+  .contacts-chat {
+    gap: 12px;
+  }
+
+  .contacts-chat {
+    align-content: start;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .submit-button-chat {
+    width: auto;
+    min-width: min(100%, 220px);
+    max-width: 100%;
+    justify-self: center;
+  }
+}
