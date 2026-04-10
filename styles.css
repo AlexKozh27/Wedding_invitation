@@ -117,6 +117,9 @@ img { max-width: 100%; }
 .section {
   width: min(calc(100% - 32px), var(--container));
   margin-inline: auto;
+  /* Optimization: Only render when needed, making initial load much faster */
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px; /* Placeholder size for the browser */
 }
 
 .hero {
