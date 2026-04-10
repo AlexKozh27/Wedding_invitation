@@ -74,8 +74,8 @@ img { max-width: 100%; }
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  opacity: 0;
-  transition: opacity .35s ease;
+  /* Make it visible by default so the poster attribute is seen immediately */
+  opacity: 1;
 }
 
 .video-shell.is-video-ready .bg-video {
@@ -110,6 +110,8 @@ img { max-width: 100%; }
 .page-shell {
   position: relative;
   z-index: 1;
+  /* Optimization: promote to own layer for smoother scrolling */
+  will-change: transform;
 }
 
 .section {
@@ -193,8 +195,15 @@ img { max-width: 100%; }
   border: 1px solid var(--line);
   background: linear-gradient(180deg, var(--glass-strong), var(--glass));
   box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@media (max-width: 700px) {
+  .glass {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
 }
 
 .soft-panel {

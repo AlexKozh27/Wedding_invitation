@@ -315,34 +315,48 @@
     };
 
     let activeMode = '';
+    let lastWidth = 0;
 
     function getBackgroundMode() {
-      return window.matchMedia('(max-width: 700px)').matches ? 'mobile' : 'desktop';
+      return window.innerWidth <= 700 ? 'mobile' : 'desktop';
     }
 
     async function applyBackgroundMedia() {
+      const currentWidth = window.innerWidth;
+      // Only trigger if width actually changed (ignores address bar toggles on mobile)
+      if (currentWidth === lastWidth) return;
+      lastWidth = currentWidth;
+
       const mode = getBackgroundMode();
       if (mode === activeMode) return;
 
       activeMode = mode;
       const { src, poster } = mediaConfig[mode];
 
-      videoShell.classList.remove('is-video-ready');
-
-      bgVideo.pause();
-      bgVideo.removeAttribute('src');
-      bgVideo.load();
-
+      // Update poster immediately for fallback
       bgVideo.poster = poster;
-      bgVideo.src = src;
-      bgVideo.load();
+      
+      // If video is already playing, we swap sources carefully
+      const isPlaying = !!(bgVideo.currentTime > 0 && !bgVideo.paused && !bgVideo.ended && bgVideo.readyState > 2);
+      
+      if (mode === 'mobile') {
+        bgVideo.setAttribute('muted', 'muted');
+        bgVideo.setAttribute('playsinline', 'true');
+      }
 
+      bgVideo.src = src;
+      
       try {
         await bgVideo.play();
+        videoShell.classList.add('is-video-ready');
       } catch (error) {
-        console.debug('Background video autoplay was blocked:', error);
+        console.log('Autoplay info:', error.message);
+        // If autoplay fails (Low Power Mode), the poster attribute handles the visual
       }
     }
+
+    // Faster initial load
+    applyBackgroundMedia();
 
     bgVideo.addEventListener('playing', () => {
       videoShell.classList.add('is-video-ready');
