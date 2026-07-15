@@ -49,7 +49,7 @@ export const seatingLayout = {
       top: 3, bottom: 5, right: 2,
       ranges: {
         // Three places stay together at the left, before the T3 segment.
-        top: { start: 20, end: 105 },
+        top: { start: 20, end: 150 },
         // The two outer places are centred rather than pinned to the ends.
         right: { start: 35, end: 75 }
       },
@@ -60,7 +60,10 @@ export const seatingLayout = {
     // edge of T2; T4 continues it upward. Their shared seam has no chairs.
     table('T3', 630, 435, 110, 245, verticalSeats('T3', 630, 435, 110, 245, {
       // The three left-hand places are deliberately grouped near the upper join.
-      left: 3, right: 4, ranges: { left: { start: 28, end: 105 } }
+      left: 3, right: 4, ranges: {
+        left: { start: 28, end: 150 },
+        right: { start: 42, end: 190 }
+      }
     })),
     table('T4', 630, 190, 110, 245, verticalSeats('T4', 630, 190, 110, 245, { top: 1, left: 5, right: 5 }))
   ]
