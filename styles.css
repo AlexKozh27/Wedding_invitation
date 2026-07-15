@@ -1238,6 +1238,7 @@ input[type="text"]:focus {
 .seating-reset:hover { background: rgba(255,255,255,.86); }
 
 .seating-table-actions { display: grid; gap: 10px; }
+.seating-table-actions[hidden] { display: none; }
 .seating-guests-button { justify-self: start; border: 1px solid rgba(162, 124, 103, .22); border-radius: 14px; padding: 12px 16px; background: linear-gradient(135deg, rgba(255,255,255,.82), rgba(248,226,218,.82)); color: #704937; font-weight: 700; cursor: pointer; }
 .seating-guests-button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(124, 80, 62, .12); }
 .seating-table-guests { padding: 14px 16px; border: 1px solid rgba(162, 124, 103, .16); border-radius: 16px; background: rgba(255,255,255,.48); }
