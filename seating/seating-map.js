@@ -52,7 +52,9 @@ export function createSeatingMap(container, layout = seatingLayout) {
     for (const seat of table.seats || []) {
       const seatGroup = svgElement('g', { class: 'seating-seat-group', 'data-seat-id': seat.id, 'data-table-id': table.id });
       seatGroup.append(svgElement('circle', { class: 'seating-seat', cx: seat.x, cy: seat.y, r: 14 }));
-      seatGroup.append(svgElement('title')).textContent = `Место ${seat.id}`;
+      const seatTitle = svgElement('title');
+      seatTitle.textContent = `Место ${seat.id}`;
+      seatGroup.append(seatTitle);
       group.append(seatGroup);
     }
     svg.append(group);
