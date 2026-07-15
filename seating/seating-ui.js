@@ -120,7 +120,7 @@ if (app) {
       const data = await apiRequest('getGuestBySeat', { seatId }, seatController);
       if (!data?.ok || !data.guest?.displayName) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       seatCache.set(seatId, data.guest);
-      showResult(data.guest.displayName, `Стол: ${data.guest.tableId}. Место: ${data.guest.seatId}.`);
+      showResult(formatGuestName(data.guest), `Стол: ${data.guest.tableId}. Место: ${data.guest.seatId}.`);
       setStatus('Гость найден.');
     } catch (error) {
       if (error.name !== 'AbortError') {
