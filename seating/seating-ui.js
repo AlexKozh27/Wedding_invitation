@@ -21,12 +21,17 @@ if (app) {
   const resultPlace = app.querySelector('.seating-result-place');
   const resetButton = app.querySelector('.seating-reset');
   const spinner = app.querySelector('.seating-spinner');
-  const map = createSeatingMap(app.querySelector('.seating-map'));
+  const tableActions = app.querySelector('.seating-table-actions');
+  const guestsButton = app.querySelector('.seating-guests-button');
+  const tableGuests = app.querySelector('.seating-table-guests');
+  let map;
   let items = [];
   let activeIndex = -1;
   let timer;
   let searchController;
   let seatController;
+  let tableController;
+  let selectedTableId;
 
   const setStatus = (message = '') => { status.textContent = message; };
   const closeSuggestions = () => {
@@ -37,7 +42,11 @@ if (app) {
   };
   const clearResult = () => {
     result.hidden = true;
-    map.resetMap();
+    tableActions.hidden = true;
+    tableGuests.hidden = true;
+    tableGuests.replaceChildren();
+    selectedTableId = undefined;
+    map?.resetMap();
     resetButton.hidden = true;
   };
   const renderSuggestions = () => {
@@ -65,6 +74,52 @@ if (app) {
     if (!response.ok) throw new Error('NETWORK_ERROR');
     return response.json();
   };
+  const showResult = (name, place) => {
+    resultName.textContent = name;
+    resultPlace.textContent = place;
+    result.hidden = false;
+  };
+  const selectTableOnMap = (tableId, seatId) => {
+    if (!map.highlightSelection(tableId, seatId)) throw new Error('LAYOUT_NOT_FOUND');
+    map.focusSelection(tableId, seatId);
+    resetButton.hidden = false;
+  };
+  const prepareTableActions = (tableId) => {
+    selectedTableId = tableId;
+    tableActions.hidden = false;
+    tableGuests.hidden = true;
+    tableGuests.replaceChildren();
+    guestsButton.textContent = `Показать гостей за столом ${tableId}`;
+  };
+  const handleTableClick = ({ tableId }) => {
+    selectTableOnMap(tableId);
+    prepareTableActions(tableId);
+    setStatus(`Стол ${tableId} выбран. Можно посмотреть гостей за этим столом.`);
+  };
+  const handleSeatClick = async ({ tableId, seatId, kind, label }) => {
+    selectTableOnMap(tableId, seatId);
+    prepareTableActions(tableId);
+    if (kind === 'newlyweds') {
+      showResult(label || 'Место молодожёнов', 'Здесь будем сидеть мы ♥');
+      setStatus('Это место молодожёнов.');
+      return;
+    }
+    if (seatController) seatController.abort();
+    seatController = new AbortController();
+    setStatus('Узнаём, кто сидит на этом месте…');
+    try {
+      const data = await apiRequest('getGuestBySeat', { seatId }, seatController);
+      if (!data?.ok || !data.guest?.displayName) throw new Error(data?.code || 'GUEST_NOT_FOUND');
+      showResult(data.guest.displayName, `Стол: ${data.guest.tableId}. Место: ${data.guest.seatId}.`);
+      setStatus('Гость найден.');
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        showResult('Место пока свободно или не назначено', `Стол: ${tableId}. Место: ${seatId}.`);
+        setStatus('Для этого места пока нет назначения.');
+      }
+    }
+  };
+  map = createSeatingMap(app.querySelector('.seating-map'), undefined, { onTableClick: handleTableClick, onSeatClick: handleSeatClick });
   const searchGuests = async () => {
     const q = normalizeSearch(input.value);
     clearResult();
@@ -104,13 +159,9 @@ if (app) {
       const data = await apiRequest('getSeat', { guestId: selected.guestId }, seatController);
       if (!data?.ok || !data.guest?.tableId) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       const guest = data.guest;
-      resultName.textContent = guest.displayName;
-      resultPlace.textContent = guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`;
-      result.hidden = false;
-      const tableFound = map.highlightSelection(guest.tableId, guest.seatId);
-      if (!tableFound) throw new Error('LAYOUT_NOT_FOUND');
-      map.focusSelection(guest.tableId, guest.seatId);
-      resetButton.hidden = false;
+      showResult(guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
+      selectTableOnMap(guest.tableId, guest.seatId);
+      prepareTableActions(guest.tableId);
       setStatus('Место найдено.');
       app.querySelector('.seating-map-wrap').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
     } catch (error) {
@@ -128,6 +179,32 @@ if (app) {
     else if (event.key === 'Escape') closeSuggestions();
   });
   input.addEventListener('blur', () => setTimeout(closeSuggestions, 150));
+  guestsButton.addEventListener('click', async () => {
+    if (!selectedTableId) return;
+    if (tableController) tableController.abort();
+    tableController = new AbortController();
+    guestsButton.disabled = true;
+    guestsButton.textContent = 'Загружаем гостей…';
+    try {
+      const data = await apiRequest('getGuestsByTable', { tableId: selectedTableId }, tableController);
+      if (!data?.ok || !Array.isArray(data.items)) throw new Error(data?.code || 'TEMPORARY_ERROR');
+      const list = document.createElement('ul');
+      list.className = 'seating-guests-list';
+      data.items.forEach((guest) => {
+        const item = document.createElement('li');
+        item.textContent = guest.seatId ? `${guest.displayName} — ${guest.seatId}` : guest.displayName;
+        list.append(item);
+      });
+      tableGuests.replaceChildren(list);
+      tableGuests.hidden = false;
+      setStatus(data.items.length ? `Гости за столом ${selectedTableId} показаны.` : `За столом ${selectedTableId} пока нет назначенных гостей.`);
+    } catch (error) {
+      if (error.name !== 'AbortError') setStatus('Не удалось загрузить гостей за этим столом. Попробуйте позже.');
+    } finally {
+      guestsButton.disabled = false;
+      guestsButton.textContent = `Показать гостей за столом ${selectedTableId}`;
+    }
+  });
   // "Показать весь зал" changes only the scale: the selected guest stays visible.
   resetButton.addEventListener('click', () => { map.showFullLayout(); setStatus('Показан весь зал; ваше место выделено.'); });
 }

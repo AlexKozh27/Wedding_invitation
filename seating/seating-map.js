@@ -52,7 +52,7 @@ export function validateLayout(layout) {
   return errors;
 }
 
-export function createSeatingMap(container, layout = seatingLayout) {
+export function createSeatingMap(container, layout = seatingLayout, { onTableClick, onSeatClick } = {}) {
   const errors = validateLayout(layout);
   if (errors.length) throw new Error(`Invalid seating layout: ${errors.join(' ')}`);
   const fullViewBox = `0 0 ${layout.viewBox.width} ${layout.viewBox.height}`;
@@ -63,20 +63,31 @@ export function createSeatingMap(container, layout = seatingLayout) {
   appendMapDecor(svg, layout);
 
   for (const table of layout.tables) {
-    const group = svgElement('g', { class: 'seating-table-group', 'data-table-id': table.id });
+    const group = svgElement('g', { class: 'seating-table-group', 'data-table-id': table.id, role: 'button', tabindex: '0', 'aria-label': `Стол ${table.id}. Нажмите, чтобы приблизить.` });
     group.append(svgElement('rect', { class: 'seating-table', x: table.x, y: table.y, width: table.width, height: table.height, rx: 18 }));
     group.append(svgElement('rect', { class: 'seating-table-inset', x: table.x + 10, y: table.y + 10, width: table.width - 20, height: table.height - 20, rx: 12 }));
     const label = svgElement('text', { class: 'seating-table-label', x: table.x + table.width / 2, y: table.y + table.height / 2 + 7, 'text-anchor': 'middle' });
     label.textContent = table.id;
     group.append(label);
     for (const seat of table.seats || []) {
-      const seatGroup = svgElement('g', { class: 'seating-seat-group', 'data-seat-id': seat.id, 'data-table-id': table.id });
-      seatGroup.append(svgElement('circle', { class: 'seating-seat', cx: seat.x, cy: seat.y, r: 14 }));
+      const seatGroup = svgElement('g', { class: `seating-seat-group${seat.kind === 'newlyweds' ? ' is-newlyweds' : ''}`, 'data-seat-id': seat.id, 'data-table-id': table.id, role: 'button', tabindex: '0', 'aria-label': seat.label || `Место ${seat.id}. Нажмите, чтобы узнать гостя.` });
+      seatGroup.append(svgElement('rect', { class: 'seating-seat', x: seat.x - 13, y: seat.y - 13, width: 26, height: 26, rx: 4 }));
       const seatTitle = svgElement('title');
-      seatTitle.textContent = `Место ${seat.id}`;
+      seatTitle.textContent = seat.label || `Место ${seat.id}`;
       seatGroup.append(seatTitle);
+      if (seat.kind === 'newlyweds') {
+        const marker = svgElement('text', { class: 'seating-newlyweds-marker', x: seat.x, y: seat.y + 7, 'text-anchor': 'middle', 'aria-hidden': 'true' });
+        marker.textContent = '♥';
+        seatGroup.append(marker);
+      }
+      const activateSeat = () => onSeatClick?.({ tableId: table.id, seatId: seat.id, kind: seat.kind, label: seat.label });
+      seatGroup.addEventListener('click', (event) => { event.stopPropagation(); activateSeat(); });
+      seatGroup.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activateSeat(); } });
       group.append(seatGroup);
     }
+    const activateTable = () => onTableClick?.({ tableId: table.id });
+    group.addEventListener('click', activateTable);
+    group.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activateTable(); } });
     svg.append(group);
   }
   container.replaceChildren(svg);

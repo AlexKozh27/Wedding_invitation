@@ -4,6 +4,8 @@ function doGet(e) {
   const action = String(e && e.parameter && e.parameter.action || '');
   if (action === 'searchGuests') return json_(searchGuests_(e.parameter.q));
   if (action === 'getSeat') return json_(getSeat_(e.parameter.guestId));
+  if (action === 'getGuestsByTable') return json_(getGuestsByTable_(e.parameter.tableId));
+  if (action === 'getGuestBySeat') return json_(getGuestBySeat_(e.parameter.seatId));
   return json_({ ok: false, code: 'BAD_REQUEST' });
 }
 function json_(data) { return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON); }
@@ -31,5 +33,25 @@ function getSeat_(guestId) {
   try {
     const guest = guests_().find(g => g.guest_id === String(guestId || ''));
     return guest ? { ok: true, guest: { displayName: guest.display_name, tableId: guest.table_id, seatId: guest.seat_id || null } } : { ok: false, code: 'GUEST_NOT_FOUND' };
+  } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
+}
+// These two actions intentionally make the seating visible on the public map.
+// Return only name + public placement; never add contact details or RSVP fields.
+function getGuestsByTable_(tableId) {
+  const id = String(tableId || '').trim();
+  if (!/^T[1-4]$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };
+  try {
+    const items = guests_().filter(g => g.table_id === id)
+      .sort((a, b) => String(a.seat_id).localeCompare(String(b.seat_id)))
+      .map(g => ({ displayName: g.display_name, seatId: g.seat_id || null }));
+    return { ok: true, items };
+  } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
+}
+function getGuestBySeat_(seatId) {
+  const id = String(seatId || '').trim();
+  if (!/^T[1-4]-S-\d{2}$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };
+  try {
+    const guest = guests_().find(g => g.seat_id === id);
+    return guest ? { ok: true, guest: { displayName: guest.display_name, tableId: guest.table_id, seatId: guest.seat_id } } : { ok: false, code: 'GUEST_NOT_FOUND' };
   } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
 }

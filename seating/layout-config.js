@@ -1,38 +1,52 @@
 /**
- * Public geometry only. Do not put guest names or assignments in this file.
+ * Public room geometry only. Never add the guest list here.
  *
- * To move a table, edit x/y/width/height. Keep table IDs stable: they are the
- * values stored in the private Seating sheet. Seat IDs are likewise stable;
- * move a seat's coordinates without renaming it when the physical chair moves.
+ * `id` values are the stable IDs used in the private Seating sheet. Move a
+ * table or chair by changing only x/y; do not rename its ID after assigning it.
+ * The two `newlyweds` places are intentionally public markers, not guest data.
  */
-const createSideSeats = (tableId, x, y, width, height) => {
-  const positions = [
-    [x + width * 0.22, y - 28], [x + width * 0.5, y - 28], [x + width * 0.78, y - 28],
-    [x + width * 0.22, y + height + 28], [x + width * 0.5, y + height + 28], [x + width * 0.78, y + height + 28]
-  ];
-  return positions.map(([seatX, seatY], index) => ({
-    id: `${tableId}-S-${String(index + 1).padStart(2, '0')}`,
-    x: seatX,
-    y: seatY
-  }));
+const seat = (id, x, y, extra = {}) => ({ id, x, y, ...extra });
+
+const horizontalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, left = 0, right = 0, newlyweds = {} } = {}) => {
+  const line = (count, axis, offset) => {
+    const base = seats.length;
+    return Array.from({ length: count }, (_, index) => {
+    const progress = (index + 1) / (count + 1);
+    const position = axis === 'x' ? [x + width * progress, y + offset] : [x + offset, y + height * progress];
+    const number = base + index + 1;
+    return seat(`${tableId}-S-${String(number).padStart(2, '0')}`, ...position, newlyweds[number] ? { kind: 'newlyweds', label: newlyweds[number] } : {});
+    });
+  };
+  const seats = [];
+  seats.push(...line(top, 'x', -32));
+  seats.push(...line(bottom, 'x', height + 32));
+  seats.push(...line(left, 'y', -32));
+  seats.push(...line(right, 'y', width + 32));
+  return seats;
 };
 
-const table = (id, x, y, width, height) => ({
-  id, x, y, width, height,
-  // Explicit, stable seat IDs are ready for the later exact-seat stage.
-  seats: createSideSeats(id, x, y, width, height)
-});
+const verticalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, left = 0, right = 0 } = {}) =>
+  horizontalSeats(tableId, x, y, width, height, { top, bottom, left, right });
+
+const table = (id, x, y, width, height, seats) => ({ id, x, y, width, height, seats });
 
 export const seatingLayout = {
-  version: '2026-07-15-1',
-  viewBox: { width: 1200, height: 1320 },
+  version: '2026-07-15-2',
+  viewBox: { width: 1200, height: 1000 },
   tables: [
-    // T1 + T2 form the horizontal lower bar of the L.
-    table('T1', 100, 560, 320, 100),
-    table('T2', 420, 560, 320, 100),
-    // T3 + T4 continue down from the right end of T2, with a clear walkway gap.
-    // Together the four segments form an inverted Russian "Г" shape.
-    table('T3', 740, 700, 100, 260),
-    table('T4', 740, 960, 100, 260)
+    // Two joined horizontal segments. The inside edge has no chairs.
+    table('T1', 100, 680, 300, 110, horizontalSeats('T1', 100, 680, 300, 110, {
+      top: 8, bottom: 8, left: 2,
+      // The last lower chair is one of the two places for the newlyweds.
+      newlyweds: { 16: 'Место молодожёнов' }
+    })),
+    table('T2', 400, 680, 340, 110, horizontalSeats('T2', 400, 680, 340, 110, {
+      top: 9, bottom: 9, right: 2,
+      // The first lower chair forms a pair with T1-S-16 at the joint.
+      newlyweds: { 10: 'Место молодожёнов' }
+    })),
+    // Vertical continuation at the right edge. The two parts have no chairs at their shared seam.
+    table('T3', 740, 190, 110, 245, verticalSeats('T3', 740, 190, 110, 245, { top: 1, left: 7, right: 7 })),
+    table('T4', 740, 435, 110, 245, verticalSeats('T4', 740, 435, 110, 245, { left: 7, right: 7 }))
   ]
 };
