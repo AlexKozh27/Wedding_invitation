@@ -25,6 +25,14 @@ const appendMapDecor = (svg, layout) => {
   svg.append(svgElement('rect', { class: 'seating-floor-glow', x: 18, y: 18, width: layout.viewBox.width - 36, height: layout.viewBox.height - 36, rx: 42 }));
 };
 
+const seatBackAttributes = (seat) => {
+  const common = { class: 'seating-seat-back' };
+  if (seat.side === 'top') return { ...common, x: seat.x - 16, y: seat.y - 18, width: 32, height: 5 };
+  if (seat.side === 'bottom') return { ...common, x: seat.x - 16, y: seat.y + 13, width: 32, height: 5 };
+  if (seat.side === 'left') return { ...common, x: seat.x - 18, y: seat.y - 16, width: 5, height: 32 };
+  return { ...common, x: seat.x + 13, y: seat.y - 16, width: 5, height: 32 };
+};
+
 export function validateLayout(layout) {
   const errors = [];
   if (!layout?.viewBox || !Array.isArray(layout.tables)) return ['Layout requires viewBox and tables.'];
@@ -72,6 +80,7 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
     for (const seat of table.seats || []) {
       const seatGroup = svgElement('g', { class: `seating-seat-group${seat.kind === 'newlyweds' ? ' is-newlyweds' : ''}`, 'data-seat-id': seat.id, 'data-table-id': table.id, role: 'button', tabindex: '0', 'aria-label': seat.label || `Место ${seat.id}. Нажмите, чтобы узнать гостя.` });
       seatGroup.append(svgElement('rect', { class: 'seating-seat', x: seat.x - 13, y: seat.y - 13, width: 26, height: 26, rx: 4 }));
+      seatGroup.append(svgElement('rect', seatBackAttributes(seat)));
       const seatTitle = svgElement('title');
       seatTitle.textContent = seat.label || `Место ${seat.id}`;
       seatGroup.append(seatTitle);

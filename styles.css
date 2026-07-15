@@ -1225,8 +1225,10 @@ input[type="text"]:focus {
 .seating-seat-group:focus-visible .seating-seat { stroke: #704937; stroke-width: 6; }
 .seating-table-group:hover .seating-table { stroke: #a86f5b; }
 .seating-seat { fill: rgba(255,255,255,.92); stroke: rgba(141, 91, 73, .46); stroke-width: 3; filter: drop-shadow(0 3px 3px rgba(90, 61, 43, .1)); }
+.seating-seat-back { fill: #c89a8a; stroke: rgba(112, 73, 55, .55); stroke-width: 1.5; pointer-events: none; }
 .seating-seat-group:hover .seating-seat { fill: #fff7f0; stroke: #a86f5b; }
 .seating-seat-group.is-newlyweds .seating-seat { fill: #b9696c; stroke: #fff4ea; stroke-width: 4; filter: drop-shadow(0 4px 7px rgba(145, 68, 75, .32)); }
+.seating-seat-group.is-newlyweds .seating-seat-back { fill: #9f535d; stroke: #fff4ea; }
 .seating-newlyweds-marker { fill: #fff8f0; font-family: Georgia, serif; font-size: 20px; pointer-events: none; }
 .seating-svg.has-selection .seating-table-group { opacity: .34; }
 .seating-svg.has-selection .seating-table-group.is-selected { opacity: 1; }

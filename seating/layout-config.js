@@ -18,7 +18,7 @@ const horizontalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, le
     return positions(count, start, end).map((coordinate, index) => {
     const position = axis === 'x' ? [coordinate, y + offset] : [x + offset, coordinate];
     const number = base + index + 1;
-    return seat(`${tableId}-S-${String(number).padStart(2, '0')}`, ...position, newlyweds[number] ? { kind: 'newlyweds', label: newlyweds[number] } : {});
+    return seat(`${tableId}-S-${String(number).padStart(2, '0')}`, ...position, { side, ...(newlyweds[number] ? { kind: 'newlyweds', label: newlyweds[number] } : {}) });
     });
   };
   const seats = [];
