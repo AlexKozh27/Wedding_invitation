@@ -202,6 +202,7 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
     setInteractiveViewBox([focusX - relative.x * width, focusY - relative.y * height, width, height]);
   };
   svg.addEventListener('pointerdown', (event) => {
+    if (!pointers.size) suppressClick = false;
     pointers.set(event.pointerId, pointerPosition(event));
     svg.setPointerCapture?.(event.pointerId);
     startGesture();
@@ -214,7 +215,7 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
       if (gesture.type !== 'pinch') startGesture();
       const center = midpoint(points[0], points[1]);
       const change = distance(points[0], points[1]);
-      if (Math.abs(change - gesture.distance) > 2) suppressClick = true;
+      if (Math.abs(change - gesture.distance) > 7) suppressClick = true;
       zoomAt(center, gesture.distance / Math.max(change, 1), gesture.box);
       return;
     }
@@ -223,7 +224,7 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
     const { rect } = relativePoint(current);
     const dx = (current.x - gesture.point.x) / rect.width * gesture.box[2];
     const dy = (current.y - gesture.point.y) / rect.height * gesture.box[3];
-    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) suppressClick = true;
+    if (Math.abs(dx) > 7 || Math.abs(dy) > 7) suppressClick = true;
     svg.classList.toggle('is-panning', suppressClick);
     setInteractiveViewBox([gesture.box[0] - dx, gesture.box[1] - dy, gesture.box[2], gesture.box[3]]);
   });
