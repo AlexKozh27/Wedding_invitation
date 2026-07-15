@@ -128,5 +128,6 @@ if (app) {
     else if (event.key === 'Escape') closeSuggestions();
   });
   input.addEventListener('blur', () => setTimeout(closeSuggestions, 150));
-  resetButton.addEventListener('click', () => { map.resetMap(); resetButton.hidden = true; });
+  // "Показать весь зал" changes only the scale: the selected guest stays visible.
+  resetButton.addEventListener('click', () => { map.showFullLayout(); setStatus('Показан весь зал; ваше место выделено.'); });
 }

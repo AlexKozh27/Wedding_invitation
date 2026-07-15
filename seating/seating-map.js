@@ -62,8 +62,11 @@ export function createSeatingMap(container, layout = seatingLayout) {
   container.replaceChildren(svg);
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  function resetMap() {
+  function showFullLayout() {
     svg.setAttribute('viewBox', fullViewBox);
+  }
+  function resetMap() {
+    showFullLayout();
     svg.classList.remove('has-selection');
     svg.querySelectorAll('.is-selected, .is-selected-seat').forEach((node) => node.classList.remove('is-selected', 'is-selected-seat'));
   }
@@ -89,5 +92,5 @@ export function createSeatingMap(container, layout = seatingLayout) {
     svg.setAttribute('viewBox', next);
     return true;
   }
-  return { resetMap, highlightSelection, focusSelection };
+  return { resetMap, showFullLayout, highlightSelection, focusSelection };
 }
