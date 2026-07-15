@@ -33,6 +33,7 @@ if (app) {
   let tableController;
   let selectedTableId;
   const searchCache = new Map();
+  const seatCache = new Map();
 
   const setStatus = (message = '') => { status.textContent = message; };
   const closeSuggestions = () => {
@@ -105,12 +106,19 @@ if (app) {
       setStatus('Это место молодожёнов.');
       return;
     }
+    if (seatCache.has(seatId)) {
+      const guest = seatCache.get(seatId);
+      showResult(guest.displayName, `Стол: ${guest.tableId}. Место: ${guest.seatId}.`);
+      setStatus('Гость найден.');
+      return;
+    }
     if (seatController) seatController.abort();
     seatController = new AbortController();
     setStatus('Узнаём, кто сидит на этом месте…');
     try {
       const data = await apiRequest('getGuestBySeat', { seatId }, seatController);
       if (!data?.ok || !data.guest?.displayName) throw new Error(data?.code || 'GUEST_NOT_FOUND');
+      seatCache.set(seatId, data.guest);
       showResult(data.guest.displayName, `Стол: ${data.guest.tableId}. Место: ${data.guest.seatId}.`);
       setStatus('Гость найден.');
     } catch (error) {
@@ -159,7 +167,7 @@ if (app) {
   const selectGuest = async (index) => {
     const selected = items[index];
     if (!selected) return;
-    input.value = selected.displayName;
+    input.value = '';
     closeSuggestions();
     if (seatController) seatController.abort();
     seatController = new AbortController();
@@ -168,6 +176,7 @@ if (app) {
       const data = await apiRequest('getSeat', { guestId: selected.guestId }, seatController);
       if (!data?.ok || !data.guest?.tableId) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       const guest = data.guest;
+      if (guest.seatId) seatCache.set(guest.seatId, guest);
       showResult(guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
       selectTableOnMap(guest.tableId, guest.seatId);
       prepareTableActions(guest.tableId);
@@ -176,7 +185,7 @@ if (app) {
       if (error.name !== 'AbortError') setStatus(error.message === 'SEAT_NOT_ON_MAP' ? 'Место из таблицы не найдено на карте. Проверьте seat_id.' : 'Не удалось найти место. Проверьте имя или напишите организатору.');
     }
   };
-  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(searchGuests, 220); });
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(searchGuests, 120); });
   input.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       if (!items.length) return;
@@ -189,23 +198,25 @@ if (app) {
   input.addEventListener('blur', () => setTimeout(closeSuggestions, 150));
   guestsButton.addEventListener('click', async () => {
     if (!selectedTableId) return;
+    const requestedTableId = selectedTableId;
     if (tableController) tableController.abort();
     tableController = new AbortController();
     guestsButton.disabled = true;
     guestsButton.textContent = 'Загружаем гостей…';
     try {
-      const data = await apiRequest('getGuestsByTable', { tableId: selectedTableId }, tableController);
+      const data = await apiRequest('getGuestsByTable', { tableId: requestedTableId }, tableController);
       if (!data?.ok || !Array.isArray(data.items)) throw new Error(data?.code || 'TEMPORARY_ERROR');
       const list = document.createElement('ul');
       list.className = 'seating-guests-list';
       data.items.forEach((guest) => {
+        if (guest.seatId) seatCache.set(guest.seatId, { displayName: guest.displayName, tableId: requestedTableId, seatId: guest.seatId });
         const item = document.createElement('li');
         item.textContent = guest.seatId ? `${guest.displayName} — ${guest.seatId}` : guest.displayName;
         list.append(item);
       });
       tableGuests.replaceChildren(list);
       tableGuests.hidden = false;
-      setStatus(data.items.length ? `Гости за столом ${selectedTableId} показаны.` : `За столом ${selectedTableId} пока нет назначенных гостей.`);
+      setStatus(data.items.length ? `Гости за столом ${requestedTableId} показаны.` : `За столом ${requestedTableId} пока нет назначенных гостей.`);
     } catch (error) {
       if (error.name !== 'AbortError') setStatus('Не удалось загрузить гостей за этим столом. Попробуйте позже.');
     } finally {
