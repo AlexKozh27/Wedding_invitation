@@ -1233,7 +1233,7 @@ input[type="text"]:focus {
 .seating-svg.has-selection .seating-table-group { opacity: .34; }
 .seating-svg.has-selection .seating-table-group.is-selected { opacity: 1; }
 .seating-table-group.is-selected .seating-table { fill: #d9a999; stroke: #8d5b49; stroke-width: 6; }
-.seating-seat-group.is-selected-seat .seating-seat { fill: #8d5b49; stroke: #fff; stroke-width: 5; animation: seating-pulse 1.3s ease-in-out infinite; }
+.seating-seat-group.is-selected-seat .seating-seat { fill: #8d5b49; stroke: #fff; stroke-width: 6; filter: drop-shadow(0 0 8px rgba(141, 91, 73, .7)); animation: seating-seat-glow 1.35s ease-in-out infinite; }
 .seating-reset { justify-self: start; border: 1px solid rgba(162, 124, 103, 0.18); border-radius: 14px; padding: 11px 16px; background: rgba(255,255,255,.62); color: #704937; cursor: pointer; }
 .seating-reset:hover { background: rgba(255,255,255,.86); }
 
@@ -1244,7 +1244,9 @@ input[type="text"]:focus {
 .seating-guests-list { display: grid; gap: 7px; margin: 0; padding-left: 20px; color: var(--muted); }
 
 @keyframes seating-spin { to { transform: rotate(360deg); } }
-@keyframes seating-pulse { 50% { transform: scale(1.18); } }
+@keyframes seating-seat-glow {
+  50% { fill: #b9696c; stroke-width: 8; filter: drop-shadow(0 0 12px rgba(185, 105, 108, .8)); }
+}
 
 @media (max-width: 700px) {
   .seating-svg { height: 360px; }
