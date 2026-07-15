@@ -1122,6 +1122,112 @@ input[type="text"]:focus {
   max-width: none;
 }
 
+/* Interactive seating: kept local to avoid changing RSVP controls. */
+.seating-search {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  margin-top: 8px;
+}
+
+.seating-label {
+  font-weight: 600;
+}
+
+.seating-combobox {
+  position: relative;
+}
+
+.seating-input {
+  width: 100%;
+  border: 1px solid rgba(162, 124, 103, 0.18);
+  background: rgba(255,255,255,0.62);
+  border-radius: 18px;
+  padding: 16px 48px 16px 18px;
+  outline: none;
+}
+
+.seating-input:focus {
+  border-color: rgba(183, 131, 126, 0.5);
+  box-shadow: 0 0 0 4px rgba(183, 131, 126, 0.1);
+}
+
+.seating-spinner {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border: 2px solid rgba(141, 91, 73, 0.2);
+  border-top-color: #8d5b49;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.seating-spinner.is-loading { opacity: 1; animation: seating-spin .7s linear infinite; }
+
+.seating-suggestions {
+  z-index: 5;
+  display: grid;
+  gap: 4px;
+  margin: -4px 0 0;
+  padding: 8px;
+  list-style: none;
+  border: 1px solid rgba(162, 124, 103, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 252, 248, 0.96);
+  box-shadow: 0 16px 32px rgba(90, 61, 43, 0.12);
+}
+
+.seating-option {
+  padding: 12px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.seating-option:hover,
+.seating-option[aria-selected="true"] { background: rgba(183, 131, 126, 0.14); }
+
+.seating-status,
+.seating-help { min-height: 1.4em; margin: 0; color: var(--muted); font-size: .94rem; }
+
+.seating-result {
+  padding: 16px 18px;
+  border: 1px solid rgba(183, 131, 126, 0.22);
+  border-radius: 18px;
+  background: rgba(255,255,255,.52);
+}
+
+.seating-result p { margin: 0; }
+.seating-result-name { font-family: 'Playfair Display', Georgia, serif; font-size: 1.35rem; color: var(--text) !important; }
+.seating-result-place { margin-top: 5px !important; }
+
+.seating-map-wrap { display: grid; gap: 12px; }
+.seating-map { overflow: hidden; border: 1px solid rgba(162, 124, 103, 0.16); border-radius: 22px; background: rgba(255,255,255,.36); }
+.seating-svg { display: block; width: 100%; min-height: 300px; }
+.seating-table { fill: rgba(229, 204, 190, .88); stroke: rgba(141, 91, 73, .55); stroke-width: 3; }
+.seating-table-label { fill: #704937; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 700; }
+.seating-seat { fill: rgba(255,255,255,.8); stroke: rgba(141, 91, 73, .42); stroke-width: 2; }
+.seating-svg.has-selection .seating-table-group { opacity: .34; }
+.seating-svg.has-selection .seating-table-group.is-selected { opacity: 1; }
+.seating-table-group.is-selected .seating-table { fill: rgba(210, 163, 151, .92); stroke: #8d5b49; stroke-width: 5; }
+.seating-seat-group.is-selected-seat .seating-seat { fill: #8d5b49; stroke: #fff; stroke-width: 5; animation: seating-pulse 1.3s ease-in-out infinite; }
+.seating-reset { justify-self: start; border: 1px solid rgba(162, 124, 103, 0.18); border-radius: 14px; padding: 11px 16px; background: rgba(255,255,255,.62); color: #704937; cursor: pointer; }
+.seating-reset:hover { background: rgba(255,255,255,.86); }
+
+@keyframes seating-spin { to { transform: rotate(360deg); } }
+@keyframes seating-pulse { 50% { transform: scale(1.18); } }
+
+@media (max-width: 700px) {
+  .seating-svg { min-height: 235px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seating-spinner.is-loading,
+  .seating-seat-group.is-selected-seat .seating-seat { animation: none; }
+}
+
 .hero-label {
   top: -28px;
   margin-bottom: 10px;

@@ -16,6 +16,8 @@
   <link rel="preload" as="image" href="./background/wedding-background-poster-desktop.jpg" media="(min-width: 701px)">
   
   <link rel="stylesheet" href="styles.css">
+  <!-- Public endpoint only: never put a Sheet ID, secret, or guest data here. -->
+  <meta name="seating-api-url" content="">
 </head>
 <body>
   <div class="video-shell" aria-hidden="true">
@@ -257,8 +259,30 @@
       <section class="section seating-section">
         <div class="glass soft-panel seating-panel">
           <span class="section-kicker">План рассадки</span>
-          <!-- <h2>Рассадка гостей</h2> -->
-          <p>Мы с заботой продумываем рассадку, чтобы каждому было комфортно и уютно. Каждому гостю мы обязательно найдём своё особенное место — информация о рассадке появится здесь же ближе к дате свадьбы.</p>
+          <h2>Найдите своё место</h2>
+          <p>Начните вводить имя или фамилию и выберите себя из списка.</p>
+
+          <div class="seating-search" data-seating-app>
+            <label class="seating-label" for="guestSearch">Имя или фамилия</label>
+            <div class="seating-combobox">
+              <input id="guestSearch" class="seating-input" type="search" autocomplete="off" placeholder="Например, Анна Иванова"
+                role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="guestSuggestions" aria-activedescendant="">
+              <span class="seating-spinner" aria-hidden="true"></span>
+            </div>
+            <ul id="guestSuggestions" class="seating-suggestions" role="listbox" aria-label="Подходящие гости" hidden></ul>
+            <p class="seating-status" role="status" aria-live="polite"></p>
+
+            <div class="seating-result" hidden aria-live="polite">
+              <p class="seating-result-name"></p>
+              <p class="seating-result-place"></p>
+            </div>
+
+            <div class="seating-map-wrap">
+              <div class="seating-map" aria-label="Схема рассадки"></div>
+              <button type="button" class="seating-reset" hidden>Показать весь зал</button>
+            </div>
+            <p class="seating-help">Не нашли себя? Напишите организатору.</p>
+          </div>
         </div>
       </section>
 
@@ -482,5 +506,6 @@
       }
     });
   </script>
+  <script type="module" src="./seating/seating-ui.js"></script>
 </body>
 </html>
