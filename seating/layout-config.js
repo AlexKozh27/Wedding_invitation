@@ -26,6 +26,13 @@ const table = (id, x, y, width, height) => ({
 export const seatingLayout = {
   version: '2026-07-15-1',
   viewBox: { width: 1200, height: 900 },
+  // Decorative public landmarks make the plan feel like a room, not a diagram.
+  // They are independent from guest data and may be moved/renamed freely.
+  landmarks: [
+    { id: 'dance-floor', label: 'Танцпол', x: 120, y: 130, width: 420, height: 280, kind: 'dance-floor' },
+    { id: 'bar', label: 'Бар', x: 910, y: 90, width: 190, height: 105, kind: 'bar' },
+    { id: 'entrance', label: 'Вход', x: 105, y: 760, width: 230, height: 72, kind: 'entrance' }
+  ],
   tables: [
     // T1 + T2 form the horizontal lower bar of the L.
     table('T1', 100, 560, 320, 100),

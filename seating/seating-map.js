@@ -7,6 +7,28 @@ const svgElement = (name, attributes = {}) => {
   return node;
 };
 
+const appendMapDecor = (svg, layout) => {
+  const defs = svgElement('defs');
+  const tableGradient = svgElement('linearGradient', { id: 'seating-table-fill', x1: '0', y1: '0', x2: '1', y2: '1' });
+  tableGradient.append(svgElement('stop', { offset: '0%', 'stop-color': '#f5dfd1' }));
+  tableGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#ddb39f' }));
+  const floorGradient = svgElement('linearGradient', { id: 'seating-floor-fill', x1: '0', y1: '0', x2: '1', y2: '1' });
+  floorGradient.append(svgElement('stop', { offset: '0%', 'stop-color': '#fffdf9' }));
+  floorGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#f3e5dc' }));
+  defs.append(tableGradient, floorGradient);
+  svg.append(defs);
+  svg.append(svgElement('rect', { class: 'seating-floor', x: 18, y: 18, width: layout.viewBox.width - 36, height: layout.viewBox.height - 36, rx: 42 }));
+
+  for (const landmark of layout.landmarks || []) {
+    const group = svgElement('g', { class: `seating-landmark seating-landmark-${landmark.kind || 'default'}` });
+    group.append(svgElement('rect', { class: 'seating-landmark-shape', x: landmark.x, y: landmark.y, width: landmark.width, height: landmark.height, rx: 26 }));
+    const label = svgElement('text', { class: 'seating-landmark-label', x: landmark.x + landmark.width / 2, y: landmark.y + landmark.height / 2 + 7, 'text-anchor': 'middle' });
+    label.textContent = landmark.label;
+    group.append(label);
+    svg.append(group);
+  }
+};
+
 export function validateLayout(layout) {
   const errors = [];
   if (!layout?.viewBox || !Array.isArray(layout.tables)) return ['Layout requires viewBox and tables.'];
@@ -42,10 +64,12 @@ export function createSeatingMap(container, layout = seatingLayout) {
   const title = svgElement('title');
   title.textContent = 'Схема рассадки';
   svg.append(title);
+  appendMapDecor(svg, layout);
 
   for (const table of layout.tables) {
     const group = svgElement('g', { class: 'seating-table-group', 'data-table-id': table.id });
     group.append(svgElement('rect', { class: 'seating-table', x: table.x, y: table.y, width: table.width, height: table.height, rx: 18 }));
+    group.append(svgElement('rect', { class: 'seating-table-inset', x: table.x + 10, y: table.y + 10, width: table.width - 20, height: table.height - 20, rx: 12 }));
     const label = svgElement('text', { class: 'seating-table-label', x: table.x + table.width / 2, y: table.y + table.height / 2 + 7, 'text-anchor': 'middle' });
     label.textContent = table.id;
     group.append(label);

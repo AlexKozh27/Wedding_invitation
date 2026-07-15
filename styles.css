@@ -1212,14 +1212,24 @@ input[type="text"]:focus {
 .seating-result-place { margin-top: 5px !important; }
 
 .seating-map-wrap { display: grid; gap: 12px; }
-.seating-map { overflow: hidden; border: 1px solid rgba(162, 124, 103, 0.16); border-radius: 22px; background: rgba(255,255,255,.36); }
-.seating-svg { display: block; width: 100%; min-height: 300px; }
-.seating-table { fill: rgba(229, 204, 190, .88); stroke: rgba(141, 91, 73, .55); stroke-width: 3; }
-.seating-table-label { fill: #704937; font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 700; }
-.seating-seat { fill: rgba(255,255,255,.8); stroke: rgba(141, 91, 73, .42); stroke-width: 2; }
+.seating-map { overflow: hidden; border: 1px solid rgba(162, 124, 103, 0.22); border-radius: 26px; background: linear-gradient(145deg, rgba(255,255,255,.66), rgba(237,219,208,.56)); box-shadow: inset 0 1px 0 rgba(255,255,255,.76), 0 16px 34px rgba(90, 61, 43, .08); }
+.seating-svg { display: block; width: 100%; min-height: 300px; background: radial-gradient(circle at 16% 12%, rgba(255,255,255,.9), transparent 30%); }
+.seating-floor { fill: url(#seating-floor-fill); stroke: rgba(171, 124, 105, .2); stroke-width: 3; }
+.seating-landmark-shape { stroke-width: 2; }
+.seating-landmark-label { font-family: 'Inter', system-ui, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.seating-landmark-dance-floor .seating-landmark-shape { fill: rgba(221, 185, 167, .24); stroke: rgba(168, 112, 91, .3); stroke-dasharray: 8 10; }
+.seating-landmark-dance-floor .seating-landmark-label { fill: rgba(128, 82, 65, .56); }
+.seating-landmark-bar .seating-landmark-shape { fill: rgba(207, 221, 205, .58); stroke: rgba(97, 133, 108, .3); }
+.seating-landmark-bar .seating-landmark-label { fill: rgba(69, 103, 78, .72); }
+.seating-landmark-entrance .seating-landmark-shape { fill: rgba(230, 215, 191, .54); stroke: rgba(145, 112, 72, .28); }
+.seating-landmark-entrance .seating-landmark-label { fill: rgba(118, 84, 47, .7); }
+.seating-table { fill: url(#seating-table-fill); stroke: rgba(126, 75, 57, .62); stroke-width: 4; filter: drop-shadow(0 8px 10px rgba(112, 73, 55, .12)); }
+.seating-table-inset { fill: none; stroke: rgba(255,255,255,.44); stroke-width: 2; pointer-events: none; }
+.seating-table-label { fill: #704937; font-family: 'Playfair Display', Georgia, serif; font-size: 30px; font-weight: 700; letter-spacing: .04em; }
+.seating-seat { fill: rgba(255,255,255,.92); stroke: rgba(141, 91, 73, .46); stroke-width: 3; filter: drop-shadow(0 3px 3px rgba(90, 61, 43, .1)); }
 .seating-svg.has-selection .seating-table-group { opacity: .34; }
 .seating-svg.has-selection .seating-table-group.is-selected { opacity: 1; }
-.seating-table-group.is-selected .seating-table { fill: rgba(210, 163, 151, .92); stroke: #8d5b49; stroke-width: 5; }
+.seating-table-group.is-selected .seating-table { fill: #d9a999; stroke: #8d5b49; stroke-width: 6; }
 .seating-seat-group.is-selected-seat .seating-seat { fill: #8d5b49; stroke: #fff; stroke-width: 5; animation: seating-pulse 1.3s ease-in-out infinite; }
 .seating-reset { justify-self: start; border: 1px solid rgba(162, 124, 103, 0.18); border-radius: 14px; padding: 11px 16px; background: rgba(255,255,255,.62); color: #704937; cursor: pointer; }
 .seating-reset:hover { background: rgba(255,255,255,.86); }
