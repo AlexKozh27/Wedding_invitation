@@ -14,19 +14,15 @@ const appendMapDecor = (svg, layout) => {
   tableGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#ddb39f' }));
   const floorGradient = svgElement('linearGradient', { id: 'seating-floor-fill', x1: '0', y1: '0', x2: '1', y2: '1' });
   floorGradient.append(svgElement('stop', { offset: '0%', 'stop-color': '#fffdf9' }));
-  floorGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#f3e5dc' }));
-  defs.append(tableGradient, floorGradient);
+  floorGradient.append(svgElement('stop', { offset: '48%', 'stop-color': '#f8e9e3' }));
+  floorGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#e8dce7' }));
+  const glowGradient = svgElement('radialGradient', { id: 'seating-floor-glow', cx: '22%', cy: '14%', r: '76%' });
+  glowGradient.append(svgElement('stop', { offset: '0%', 'stop-color': '#fff', 'stop-opacity': '.86' }));
+  glowGradient.append(svgElement('stop', { offset: '100%', 'stop-color': '#fff', 'stop-opacity': '0' }));
+  defs.append(tableGradient, floorGradient, glowGradient);
   svg.append(defs);
   svg.append(svgElement('rect', { class: 'seating-floor', x: 18, y: 18, width: layout.viewBox.width - 36, height: layout.viewBox.height - 36, rx: 42 }));
-
-  for (const landmark of layout.landmarks || []) {
-    const group = svgElement('g', { class: `seating-landmark seating-landmark-${landmark.kind || 'default'}` });
-    group.append(svgElement('rect', { class: 'seating-landmark-shape', x: landmark.x, y: landmark.y, width: landmark.width, height: landmark.height, rx: 26 }));
-    const label = svgElement('text', { class: 'seating-landmark-label', x: landmark.x + landmark.width / 2, y: landmark.y + landmark.height / 2 + 7, 'text-anchor': 'middle' });
-    label.textContent = landmark.label;
-    group.append(label);
-    svg.append(group);
-  }
+  svg.append(svgElement('rect', { class: 'seating-floor-glow', x: 18, y: 18, width: layout.viewBox.width - 36, height: layout.viewBox.height - 36, rx: 42 }));
 };
 
 export function validateLayout(layout) {
@@ -86,8 +82,25 @@ export function createSeatingMap(container, layout = seatingLayout) {
   container.replaceChildren(svg);
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let viewBoxAnimation;
+  const readViewBox = () => svg.getAttribute('viewBox').split(/\s+/).map(Number);
+  const setViewBox = (box) => svg.setAttribute('viewBox', box.join(' '));
+  function animateViewBox(next) {
+    if (viewBoxAnimation) cancelAnimationFrame(viewBoxAnimation);
+    if (prefersReducedMotion.matches) return setViewBox(next);
+    const start = readViewBox();
+    const startedAt = performance.now();
+    const duration = 520;
+    const step = (now) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      setViewBox(start.map((value, index) => value + (next[index] - value) * eased));
+      if (progress < 1) viewBoxAnimation = requestAnimationFrame(step);
+    };
+    viewBoxAnimation = requestAnimationFrame(step);
+  }
   function showFullLayout() {
-    svg.setAttribute('viewBox', fullViewBox);
+    animateViewBox(fullViewBox.split(' ').map(Number));
   }
   function resetMap() {
     showFullLayout();
@@ -111,9 +124,8 @@ export function createSeatingMap(container, layout = seatingLayout) {
     const box = target?.getBBox();
     if (!box) return false;
     const pad = seatId ? 120 : 90;
-    const next = `${Math.max(0, box.x - pad)} ${Math.max(0, box.y - pad)} ${Math.min(layout.viewBox.width, box.width + pad * 2)} ${Math.min(layout.viewBox.height, box.height + pad * 2)}`;
-    if (!prefersReducedMotion.matches) svg.style.transition = 'viewBox 360ms ease';
-    svg.setAttribute('viewBox', next);
+    const next = [Math.max(0, box.x - pad), Math.max(0, box.y - pad), Math.min(layout.viewBox.width, box.width + pad * 2), Math.min(layout.viewBox.height, box.height + pad * 2)];
+    animateViewBox(next);
     return true;
   }
   return { resetMap, showFullLayout, highlightSelection, focusSelection };
