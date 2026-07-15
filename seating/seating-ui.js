@@ -170,6 +170,7 @@ if (app) {
     if (!selected) return;
     input.value = '';
     closeSuggestions();
+    input.blur();
     if (seatController) seatController.abort();
     seatController = new AbortController();
     setStatus('Загружаем ваше место…');

@@ -1106,7 +1106,9 @@ input[type="text"]:focus {
 
 .seating-map-wrap { display: grid; gap: 12px; }
 .seating-map { overflow: hidden; border: 1px solid rgba(162, 124, 103, 0.22); border-radius: 26px; background: linear-gradient(145deg, rgba(255,255,255,.72), rgba(243,220,213,.66) 54%, rgba(227,215,232,.58)); box-shadow: inset 0 1px 0 rgba(255,255,255,.76), 0 18px 38px rgba(90, 61, 43, .1); }
-.seating-svg { display: block; width: 100%; height: clamp(330px, 55vw, 520px); background: radial-gradient(circle at 16% 12%, rgba(255,255,255,.9), transparent 30%); }
+.seating-svg { display: block; width: 100%; height: clamp(330px, 55vw, 520px); background: radial-gradient(circle at 16% 12%, rgba(255,255,255,.9), transparent 30%); touch-action: none; user-select: none; -webkit-user-select: none; }
+.seating-svg.is-pannable { cursor: grab; }
+.seating-svg.is-panning { cursor: grabbing; }
 .seating-floor { fill: url(#seating-floor-fill); stroke: rgba(171, 124, 105, .2); stroke-width: 3; }
 .seating-floor-glow { fill: url(#seating-floor-glow); pointer-events: none; }
 .seating-table { fill: url(#seating-table-fill); stroke: rgba(126, 75, 57, .62); stroke-width: 4; filter: drop-shadow(0 8px 10px rgba(112, 73, 55, .12)); }

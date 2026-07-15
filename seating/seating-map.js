@@ -105,16 +105,42 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
   let viewBoxAnimation;
   const readViewBox = () => svg.getAttribute('viewBox').split(/\s+/).map(Number);
   const setViewBox = (box) => svg.setAttribute('viewBox', box.join(' '));
+  const minViewBoxSize = 170;
+  const clampViewBox = ([x, y, width, height]) => {
+    const nextWidth = Math.min(layout.viewBox.width, Math.max(minViewBoxSize, width));
+    const nextHeight = Math.min(layout.viewBox.height, Math.max(minViewBoxSize, height));
+    return [
+      Math.min(Math.max(0, x), layout.viewBox.width - nextWidth),
+      Math.min(Math.max(0, y), layout.viewBox.height - nextHeight),
+      nextWidth,
+      nextHeight
+    ];
+  };
+  const isZoomed = () => {
+    const [, , width, height] = readViewBox();
+    return width < layout.viewBox.width - 1 || height < layout.viewBox.height - 1;
+  };
+  const refreshPanState = () => svg.classList.toggle('is-pannable', isZoomed());
+  const setInteractiveViewBox = (box) => {
+    if (viewBoxAnimation) cancelAnimationFrame(viewBoxAnimation);
+    setViewBox(clampViewBox(box));
+    refreshPanState();
+  };
   function animateViewBox(next) {
     if (viewBoxAnimation) cancelAnimationFrame(viewBoxAnimation);
-    if (prefersReducedMotion.matches) return setViewBox(next);
+    if (prefersReducedMotion.matches) {
+      setViewBox(clampViewBox(next));
+      refreshPanState();
+      return;
+    }
     const start = readViewBox();
     const startedAt = performance.now();
     const duration = 520;
     const step = (now) => {
       const progress = Math.min(1, (now - startedAt) / duration);
       const eased = 1 - Math.pow(1 - progress, 4);
-      setViewBox(start.map((value, index) => value + (next[index] - value) * eased));
+      setViewBox(clampViewBox(start.map((value, index) => value + (next[index] - value) * eased)));
+      refreshPanState();
       if (progress < 1) viewBoxAnimation = requestAnimationFrame(step);
     };
     viewBoxAnimation = requestAnimationFrame(step);
@@ -148,5 +174,76 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
     animateViewBox(next);
     return true;
   }
+  const pointers = new Map();
+  let gesture;
+  let suppressClick = false;
+  const pointerPosition = (event) => ({ x: event.clientX, y: event.clientY });
+  const midpoint = (first, second) => ({ x: (first.x + second.x) / 2, y: (first.y + second.y) / 2 });
+  const distance = (first, second) => Math.hypot(first.x - second.x, first.y - second.y);
+  const relativePoint = (point) => {
+    const rect = svg.getBoundingClientRect();
+    return { x: (point.x - rect.left) / rect.width, y: (point.y - rect.top) / rect.height, rect };
+  };
+  const startGesture = () => {
+    const points = [...pointers.values()];
+    if (points.length === 1) {
+      gesture = { type: 'pan', point: points[0], box: readViewBox() };
+    } else if (points.length >= 2) {
+      const center = midpoint(points[0], points[1]);
+      gesture = { type: 'pinch', center, distance: distance(points[0], points[1]), box: readViewBox() };
+    }
+  };
+  const zoomAt = (point, factor, base = readViewBox()) => {
+    const relative = relativePoint(point);
+    const width = Math.min(layout.viewBox.width, Math.max(minViewBoxSize, base[2] * factor));
+    const height = Math.min(layout.viewBox.height, Math.max(minViewBoxSize, base[3] * factor));
+    const focusX = base[0] + relative.x * base[2];
+    const focusY = base[1] + relative.y * base[3];
+    setInteractiveViewBox([focusX - relative.x * width, focusY - relative.y * height, width, height]);
+  };
+  svg.addEventListener('pointerdown', (event) => {
+    pointers.set(event.pointerId, pointerPosition(event));
+    svg.setPointerCapture?.(event.pointerId);
+    startGesture();
+  });
+  svg.addEventListener('pointermove', (event) => {
+    if (!pointers.has(event.pointerId) || !gesture) return;
+    pointers.set(event.pointerId, pointerPosition(event));
+    const points = [...pointers.values()];
+    if (points.length >= 2) {
+      if (gesture.type !== 'pinch') startGesture();
+      const center = midpoint(points[0], points[1]);
+      const change = distance(points[0], points[1]);
+      if (Math.abs(change - gesture.distance) > 2) suppressClick = true;
+      zoomAt(center, gesture.distance / Math.max(change, 1), gesture.box);
+      return;
+    }
+    if (gesture.type !== 'pan' || !isZoomed()) return;
+    const current = points[0];
+    const { rect } = relativePoint(current);
+    const dx = (current.x - gesture.point.x) / rect.width * gesture.box[2];
+    const dy = (current.y - gesture.point.y) / rect.height * gesture.box[3];
+    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) suppressClick = true;
+    svg.classList.toggle('is-panning', suppressClick);
+    setInteractiveViewBox([gesture.box[0] - dx, gesture.box[1] - dy, gesture.box[2], gesture.box[3]]);
+  });
+  const endPointerGesture = (event) => {
+    pointers.delete(event.pointerId);
+    svg.classList.remove('is-panning');
+    gesture = undefined;
+    if (pointers.size) startGesture();
+  };
+  svg.addEventListener('pointerup', endPointerGesture);
+  svg.addEventListener('pointercancel', endPointerGesture);
+  svg.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    zoomAt(pointerPosition(event), event.deltaY < 0 ? 0.84 : 1.2);
+  }, { passive: false });
+  svg.addEventListener('click', (event) => {
+    if (!suppressClick) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    suppressClick = false;
+  }, true);
   return { resetMap, showFullLayout, highlightSelection, focusSelection };
 }

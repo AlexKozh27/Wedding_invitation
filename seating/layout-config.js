@@ -59,12 +59,12 @@ export const seatingLayout = {
   viewBox: { width: 1200, height: 1000 },
   tables: assignClockwiseSeatIds([
     // Two joined horizontal segments. The inside edge has no chairs.
-    table('T1', 100, 680, 300, 110, horizontalSeats('T1', 100, 680, 300, 110, {
+    table('T1', 300, 680, 300, 110, horizontalSeats('T1', 300, 680, 300, 110, {
       top: 5, bottom: 5, left: 1,
       // The last lower chair is one of the two places for the newlyweds.
       newlyweds: { 10: 'Место молодожёнов' }
     })),
-    table('T2', 400, 680, 300, 110, horizontalSeats('T2', 400, 680, 300, 110, {
+    table('T2', 600, 680, 300, 110, horizontalSeats('T2', 600, 680, 300, 110, {
       // Top chairs stop before the vertical T3 segment begins.
       top: 3, bottom: 5, right: 2,
       ranges: {
@@ -78,13 +78,13 @@ export const seatingLayout = {
     })),
     // T3 is the lower vertical segment. Its entire short edge touches the top
     // edge of T2; T4 continues it upward. Their shared seam has no chairs.
-    table('T3', 590, 435, 110, 245, verticalSeats('T3', 590, 435, 110, 245, {
+    table('T3', 790, 435, 110, 245, verticalSeats('T3', 790, 435, 110, 245, {
       // The three left-hand places are deliberately grouped near the upper join.
       left: 3, right: 4, ranges: {
         left: { start: 28, end: 150 },
         right: { start: 36, end: 205 }
       }
     })),
-    table('T4', 590, 190, 110, 245, verticalSeats('T4', 590, 190, 110, 245, { top: 1, left: 5, right: 5 }))
+    table('T4', 790, 190, 110, 245, verticalSeats('T4', 790, 190, 110, 245, { top: 1, left: 5, right: 5 }))
   ])
 };
