@@ -29,8 +29,8 @@ const horizontalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, le
   return seats;
 };
 
-const verticalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, left = 0, right = 0 } = {}) =>
-  horizontalSeats(tableId, x, y, width, height, { top, bottom, left, right });
+const verticalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, left = 0, right = 0, ranges = {} } = {}) =>
+  horizontalSeats(tableId, x, y, width, height, { top, bottom, left, right, ranges });
 
 const table = (id, x, y, width, height, seats) => ({ id, x, y, width, height, seats });
 
@@ -47,13 +47,21 @@ export const seatingLayout = {
     table('T2', 400, 680, 340, 110, horizontalSeats('T2', 400, 680, 340, 110, {
       // Top chairs stop before the vertical T3 segment begins.
       top: 3, bottom: 5, right: 2,
-      ranges: { top: { start: 20, end: 190 } },
+      ranges: {
+        // Three places stay together at the left, before the T3 segment.
+        top: { start: 20, end: 105 },
+        // The two outer places are centred rather than pinned to the ends.
+        right: { start: 35, end: 75 }
+      },
       // The first lower chair forms a pair with T1-S-10 at the joint.
       newlyweds: { 4: 'Место молодожёнов' }
     })),
     // T3 is the lower vertical segment. Its entire short edge touches the top
     // edge of T2; T4 continues it upward. Their shared seam has no chairs.
-    table('T3', 630, 435, 110, 245, verticalSeats('T3', 630, 435, 110, 245, { left: 3, right: 4 })),
+    table('T3', 630, 435, 110, 245, verticalSeats('T3', 630, 435, 110, 245, {
+      // The three left-hand places are deliberately grouped near the upper join.
+      left: 3, right: 4, ranges: { left: { start: 28, end: 105 } }
+    })),
     table('T4', 630, 190, 110, 245, verticalSeats('T4', 630, 190, 110, 245, { top: 1, left: 5, right: 5 }))
   ]
 };
