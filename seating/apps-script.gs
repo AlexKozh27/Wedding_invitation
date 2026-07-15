@@ -39,7 +39,7 @@ function getSeat_(guestId) {
   } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
 }
 // These two actions intentionally make the seating visible on the public map.
-// Return only name + public placement; never add contact details or RSVP fields.
+// Return only name + public placement; never add contact details or internal fields.
 function getGuestsByTable_(tableId) {
   const id = String(tableId || '').trim();
   if (!/^T[1-4]$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };

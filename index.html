@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f5efe8">
   <meta name="color-scheme" content="light">
   <title>Свадьба Лёши и Ксюши — 1 августа 2026</title>
-  <meta name="description" content="Приглашение на свадьбу Лёши и Ксюши — дата, локация, дресс-код, тайминг и форма подтверждения участия.">
+  <meta name="description" content="Приглашение на свадьбу Лёши и Ксюши — дата, локация, дресс-код, тайминг и план рассадки гостей.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -291,51 +291,12 @@
         </div>
       </section>
 
-      <section class="section rsvp-section">
-        <div class="section-heading rsvp-heading">
-          <h2>Подтвердите участие</h2>
-          <p>Пожалуйста, сообщите нам <strong>до 12 июля</strong>, сможете ли вы присутствовать на нашем празднике. Это поможет нам с любовью и вниманием подготовить день для каждого гостя.</p>
-        </div>
-
-        <div class="glass soft-panel form-panel form-panel-wide">
-          <form id="rsvpForm" class="rsvp-form">
-            <label class="field">
-              <span>Ваши ФИО</span>
-              <input type="text" id="name" name="name" placeholder="Введите ваше полное имя" required>
-            </label>
-
-            <div class="honeypot" aria-hidden="true">
-              <label for="fax_number">Fax Number</label>
-              <input type="text" id="fax_number" name="fax_number" tabindex="-1" autocomplete="off">
-            </div>
-
-            <div class="field">
-              <span>Будете ли вы присутствовать?</span>
-              <input type="hidden" id="attending" name="attending" value="">
-              <div class="choice-row choice-row-balanced">
-                <button type="button" id="attendYes" class="choice-button" onclick="selectAttending('yes')">Да, буду!</button>
-                <button type="button" id="attendNo" class="choice-button" onclick="selectAttending('no')">Не смогу</button>
-              </div>
-            </div>
-
-            <button type="submit" id="submitBtn" class="submit-button submit-button-wide" disabled>Отправить ответ</button>
-          </form>
-        </div>
-      </section>
     </main>
 
     <footer class="footer section">
       <p class="footer-title">С любовью, Лёша &amp; Ксюша 💕</p>
       <p>Мы с нетерпением ждём встречи с вами в этот особенный день.</p>
     </footer>
-  </div>
-
-  <div id="successModal" class="modal hidden">
-    <div class="modal-card glass soft-panel">
-      <h3>Спасибо за ответ!</h3>
-      <p>Мы рады, что вы с нами в этот особенный день.</p>
-      <button id="closeModal" class="submit-button">Закрыть</button>
-    </div>
   </div>
 
     <script>
@@ -423,77 +384,6 @@
       bgVideo.play().catch(() => {});
     }, { passive: true, once: true });
 
-    function applyChoiceClasses() {
-      const yesBtn = document.getElementById('attendYes');
-      const noBtn = document.getElementById('attendNo');
-      yesBtn.className = 'choice-button';
-      noBtn.className = 'choice-button';
-    }
-
-    function selectAttending(value) {
-      const yesBtn = document.getElementById('attendYes');
-      const noBtn = document.getElementById('attendNo');
-      const hiddenInput = document.getElementById('attending');
-      const submitBtn = document.getElementById('submitBtn');
-
-      applyChoiceClasses();
-
-      if (value === 'yes') {
-        yesBtn.classList.add('is-selected', 'is-yes');
-      } else {
-        noBtn.classList.add('is-selected', 'is-no');
-      }
-
-      hiddenInput.value = value;
-      const name = document.getElementById('name').value.trim();
-      submitBtn.disabled = !(name && value);
-    }
-
-    document.getElementById('rsvpForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value.trim();
-      const attending = document.getElementById('attending').value;
-      const honeypot = document.getElementById('fax_number').value.trim();
-      const submitBtn = document.getElementById('submitBtn');
-      const originalText = submitBtn.textContent;
-
-      if (honeypot || !name || !attending) {
-        return;
-      }
-
-      submitBtn.textContent = 'Отправка...';
-      submitBtn.disabled = true;
-
-      try {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('attending', attending);
-
-        await fetch('https://script.google.com/macros/s/AKfycbwQC5cjAcMq0MPjWE-hrZ_f7dTXo4CADzjh7W-LoiH-2wAMqB-DlPD_OQoSB-UD88N-bQ/exec', {
-          method: 'POST',
-          body: formData
-        });
-
-        document.getElementById('successModal').classList.remove('hidden');
-        document.getElementById('name').value = '';
-        document.getElementById('attending').value = '';
-        applyChoiceClasses();
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Произошла ошибка при отправке. Попробуйте еще раз.');
-      } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = true;
-      }
-    });
-
-    document.getElementById('name').addEventListener('input', function () {
-      const name = this.value.trim();
-      const attending = document.getElementById('attending').value;
-      document.getElementById('submitBtn').disabled = !(name && attending);
-    });
-
     document.getElementById('chatButton')?.addEventListener('click', function (e) {
       if (!this.dataset.chatReady) {
         e.preventDefault();
@@ -501,15 +391,6 @@
       }
     });
 
-    document.getElementById('closeModal').addEventListener('click', function () {
-      document.getElementById('successModal').classList.add('hidden');
-    });
-
-    document.getElementById('successModal').addEventListener('click', function (e) {
-      if (e.target.id === 'successModal') {
-        this.classList.add('hidden');
-      }
-    });
   </script>
   <script type="module" src="./seating/seating-ui.js"></script>
 </body>

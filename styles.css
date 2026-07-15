@@ -251,7 +251,6 @@ main {
 
 .info-card,
 .prose-panel,
-.form-panel,
 .iris-panel,
 .timeline-editorial,
 .hosting-panel {
@@ -565,39 +564,6 @@ main {
   color: var(--text);
 }
 
-.rsvp-section {
-  padding-bottom: 28px;
-}
-
-.rsvp-heading {
-  max-width: 780px;
-  margin-inline: auto;
-  text-align: center;
-}
-
-.form-panel {
-  max-width: 760px;
-}
-
-.form-panel-wide {
-  width: min(100%, 880px);
-  margin-inline: auto;
-}
-
-.rsvp-form {
-  display: grid;
-  gap: 22px;
-}
-
-.field {
-  display: grid;
-  gap: 10px;
-}
-
-.field > span {
-  font-weight: 600;
-}
-
 input[type="text"] {
   width: 100%;
   border: 1px solid rgba(162, 124, 103, 0.18);
@@ -612,47 +578,12 @@ input[type="text"]:focus {
   box-shadow: 0 0 0 4px rgba(183, 131, 126, 0.1);
 }
 
-.honeypot {
-  position: absolute;
-  left: -9999px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.choice-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.choice-row-balanced {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.choice-button,
 .submit-button {
   border: 0;
   border-radius: 18px;
   padding: 15px 22px;
   cursor: pointer;
   transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
-}
-
-.choice-button {
-  background: rgba(255,255,255,0.62);
-  color: var(--text);
-  border: 1px solid rgba(162, 124, 103, 0.16);
-}
-
-.choice-button.is-selected.is-yes {
-  background: rgba(222, 243, 229, 0.92);
-  border-color: rgba(88, 158, 106, 0.3);
-}
-
-.choice-button.is-selected.is-no {
-  background: rgba(249, 228, 228, 0.92);
-  border-color: rgba(184, 95, 95, 0.25);
 }
 
 .submit-button {
@@ -663,11 +594,6 @@ input[type="text"]:focus {
   box-shadow: 0 16px 36px rgba(124, 80, 62, 0.22);
 }
 
-.submit-button-wide {
-  width: 100%;
-  justify-self: stretch;
-}
-
 .submit-button:disabled {
   opacity: .55;
   cursor: not-allowed;
@@ -675,7 +601,6 @@ input[type="text"]:focus {
   box-shadow: none;
 }
 
-.choice-button:hover:not(:disabled),
 .submit-button:hover:not(:disabled) {
   transform: translateY(-1px);
 }
@@ -696,35 +621,6 @@ input[type="text"]:focus {
   color: var(--muted);
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: rgba(35, 27, 22, 0.34);
-  display: grid;
-  place-items: center;
-  padding: 20px;
-}
-
-.modal.hidden { display: none; }
-
-.modal-card {
-  width: min(100%, 460px);
-  padding: 28px;
-  text-align: center;
-}
-
-.modal-card h3 {
-  margin: 0 0 10px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 2rem;
-}
-
-.modal-card p {
-  margin: 0 0 20px;
-  color: var(--muted);
-}
-
 @media (max-width: 980px) {
   .info-grid,
   .hosting-panel,
@@ -736,9 +632,6 @@ input[type="text"]:focus {
     min-height: 320px;
   }
 
-  .form-panel-wide {
-    width: 100%;
-  }
 }
 
 @media (max-width: 700px) {
@@ -1122,7 +1015,7 @@ input[type="text"]:focus {
   max-width: none;
 }
 
-/* Interactive seating: kept local to avoid changing RSVP controls. */
+/* Interactive seating controls. */
 .seating-search {
   display: grid;
   gap: 12px;
