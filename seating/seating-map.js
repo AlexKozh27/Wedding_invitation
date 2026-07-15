@@ -64,8 +64,8 @@ export function createSeatingMap(container, layout = seatingLayout, { onTableCli
 
   for (const table of layout.tables) {
     const group = svgElement('g', { class: 'seating-table-group', 'data-table-id': table.id, role: 'button', tabindex: '0', 'aria-label': `Стол ${table.id}. Нажмите, чтобы приблизить.` });
-    group.append(svgElement('rect', { class: 'seating-table', x: table.x, y: table.y, width: table.width, height: table.height, rx: 18 }));
-    group.append(svgElement('rect', { class: 'seating-table-inset', x: table.x + 10, y: table.y + 10, width: table.width - 20, height: table.height - 20, rx: 12 }));
+    group.append(svgElement('rect', { class: 'seating-table', x: table.x, y: table.y, width: table.width, height: table.height }));
+    group.append(svgElement('rect', { class: 'seating-table-inset', x: table.x + 10, y: table.y + 10, width: table.width - 20, height: table.height - 20 }));
     const label = svgElement('text', { class: 'seating-table-label', x: table.x + table.width / 2, y: table.y + table.height / 2 + 7, 'text-anchor': 'middle' });
     label.textContent = table.id;
     group.append(label);
