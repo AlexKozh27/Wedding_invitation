@@ -81,7 +81,7 @@ if (app) {
   };
   const selectTableOnMap = (tableId, seatId) => {
     if (!map.highlightSelection(tableId, seatId)) throw new Error('LAYOUT_NOT_FOUND');
-    map.focusSelection(tableId, seatId);
+    if (!map.focusSelection(tableId, seatId)) throw new Error(seatId ? 'SEAT_NOT_ON_MAP' : 'LAYOUT_NOT_FOUND');
     resetButton.hidden = false;
   };
   const prepareTableActions = (tableId) => {
@@ -159,13 +159,12 @@ if (app) {
       const data = await apiRequest('getSeat', { guestId: selected.guestId }, seatController);
       if (!data?.ok || !data.guest?.tableId) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       const guest = data.guest;
-      showResult(guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
+      showResult(guest.seatId ? `Здесь сидит ${guest.displayName}` : guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
       selectTableOnMap(guest.tableId, guest.seatId);
       prepareTableActions(guest.tableId);
       setStatus('Место найдено.');
-      app.querySelector('.seating-map-wrap').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
     } catch (error) {
-      if (error.name !== 'AbortError') setStatus('Не удалось найти место. Проверьте имя или напишите организатору.');
+      if (error.name !== 'AbortError') setStatus(error.message === 'SEAT_NOT_ON_MAP' ? 'Место из таблицы не найдено на карте. Проверьте seat_id.' : 'Не удалось найти место. Проверьте имя или напишите организатору.');
     }
   };
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(searchGuests, 350); });
