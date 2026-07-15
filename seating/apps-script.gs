@@ -9,6 +9,9 @@ function doGet(e) {
   return json_({ ok: false, code: 'BAD_REQUEST' });
 }
 function json_(data) { return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON); }
+// Run this manually from the Apps Script editor immediately after changing seats.
+// It is not exposed through the public Web App.
+function clearSeatingCache() { CacheService.getScriptCache().remove('seating-guests'); }
 function normalizeSearch_(value) { return String(value || '').toLowerCase().replace(/ё/g, 'е').replace(/[^а-яa-z0-9\s-]/gi, ' ').replace(/\s+/g, ' ').trim(); }
 function guests_() {
   const cache = CacheService.getScriptCache(), cached = cache.get('seating-guests');
