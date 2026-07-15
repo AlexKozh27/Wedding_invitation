@@ -34,10 +34,30 @@ const verticalSeats = (tableId, x, y, width, height, { top = 0, bottom = 0, left
 
 const table = (id, x, y, width, height, seats) => ({ id, x, y, width, height, seats });
 
+// The physical clockwise order starts above T4 and follows the outer perimeter.
+// Keeping seat IDs global makes the number written on a paper plan unambiguous.
+const assignClockwiseSeatIds = (tables) => {
+  const byTable = Object.fromEntries(tables.map((item) => [item.id, item]));
+  const path = [
+    ['T4', [0, 6, 7, 8, 9, 10]], // top, then right side down
+    ['T3', [3, 4, 5, 6]],         // right side down
+    ['T2', [8, 9, 7, 6, 5, 4, 3]], // right side, then bottom right-to-left
+    ['T1', [9, 8, 7, 6, 5, 10, 0, 1, 2, 3, 4]], // bottom, left, then top left-to-right
+    ['T2', [0, 1, 2]],            // top left-to-right
+    ['T3', [2, 1, 0]],            // left side bottom-to-top
+    ['T4', [5, 4, 3, 2, 1]]      // left side bottom-to-top
+  ];
+  let number = 1;
+  path.forEach(([tableId, indexes]) => indexes.forEach((index) => {
+    byTable[tableId].seats[index].id = `S-${String(number++).padStart(2, '0')}`;
+  }));
+  return tables;
+};
+
 export const seatingLayout = {
-  version: '2026-07-15-2',
+  version: '2026-07-15-3',
   viewBox: { width: 1200, height: 1000 },
-  tables: [
+  tables: assignClockwiseSeatIds([
     // Two joined horizontal segments. The inside edge has no chairs.
     table('T1', 100, 680, 300, 110, horizontalSeats('T1', 100, 680, 300, 110, {
       top: 5, bottom: 5, left: 1,
@@ -53,7 +73,7 @@ export const seatingLayout = {
         // The two outer places are centred rather than pinned to the ends.
         right: { start: 35, end: 75 }
       },
-      // The first lower chair forms a pair with T1-S-10 at the joint.
+      // The first lower chair forms a pair with T1's newlyweds place.
       newlyweds: { 4: 'Место молодожёнов' }
     })),
     // T3 is the lower vertical segment. Its entire short edge touches the top
@@ -66,5 +86,5 @@ export const seatingLayout = {
       }
     })),
     table('T4', 590, 190, 110, 245, verticalSeats('T4', 590, 190, 110, 245, { top: 1, left: 5, right: 5 }))
-  ]
+  ])
 };

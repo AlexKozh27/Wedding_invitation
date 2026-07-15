@@ -49,7 +49,7 @@ function getGuestsByTable_(tableId) {
 }
 function getGuestBySeat_(seatId) {
   const id = String(seatId || '').trim();
-  if (!/^T[1-4]-S-\d{2}$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };
+  if (!/^S-(?:0[1-9]|[12]\d|3[0-9])$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };
   try {
     const guest = guests_().find(g => g.seat_id === id);
     return guest ? { ok: true, guest: { displayName: guest.display_name, tableId: guest.table_id, seatId: guest.seat_id } } : { ok: false, code: 'GUEST_NOT_FOUND' };
