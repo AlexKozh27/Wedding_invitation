@@ -1136,6 +1136,7 @@ input[type="text"]:focus {
 
 .seating-combobox {
   position: relative;
+  z-index: 6;
 }
 
 .seating-input {
@@ -1168,10 +1169,14 @@ input[type="text"]:focus {
 .seating-spinner.is-loading { opacity: 1; animation: seating-spin .7s linear infinite; }
 
 .seating-suggestions {
-  z-index: 5;
+  position: absolute;
+  z-index: 7;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
   display: grid;
   gap: 4px;
-  margin: -4px 0 0;
+  margin: 0;
   padding: 8px;
   list-style: none;
   border: 1px solid rgba(162, 124, 103, 0.18);
@@ -1179,6 +1184,9 @@ input[type="text"]:focus {
   background: rgba(255, 252, 248, 0.96);
   box-shadow: 0 16px 32px rgba(90, 61, 43, 0.12);
 }
+
+/* The HTML hidden attribute must win over the grid display declaration above. */
+.seating-suggestions[hidden] { display: none; }
 
 .seating-option {
   padding: 12px 14px;
