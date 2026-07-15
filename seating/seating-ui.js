@@ -32,6 +32,7 @@ if (app) {
   let seatController;
   let tableController;
   let selectedTableId;
+  const searchCache = new Map();
 
   const setStatus = (message = '') => { status.textContent = message; };
   const closeSuggestions = () => {
@@ -130,6 +131,12 @@ if (app) {
       setStatus(q ? 'Введите минимум 3 символа.' : '');
       return;
     }
+    if (searchCache.has(q)) {
+      items = searchCache.get(q);
+      renderSuggestions();
+      setStatus(items.length ? `Найдено вариантов: ${items.length}.` : 'Совпадений не найдено. Проверьте имя или напишите организатору.');
+      return;
+    }
     searchController = new AbortController();
     spinner.classList.add('is-loading');
     setStatus('Ищем совпадения…');
@@ -137,6 +144,8 @@ if (app) {
       const data = await apiRequest('searchGuests', { q }, searchController);
       if (!data?.ok) throw new Error(data?.code || 'TEMPORARY_ERROR');
       items = Array.isArray(data.items) ? data.items.slice(0, 5).filter((item) => item?.guestId && item?.displayName) : [];
+      if (searchCache.size >= 20) searchCache.delete(searchCache.keys().next().value);
+      searchCache.set(q, items);
       renderSuggestions();
       setStatus(items.length ? `Найдено вариантов: ${items.length}.` : 'Совпадений не найдено. Проверьте имя или напишите организатору.');
     } catch (error) {
@@ -159,7 +168,7 @@ if (app) {
       const data = await apiRequest('getSeat', { guestId: selected.guestId }, seatController);
       if (!data?.ok || !data.guest?.tableId) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       const guest = data.guest;
-      showResult(guest.seatId ? `Здесь сидит ${guest.displayName}` : guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
+      showResult(guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
       selectTableOnMap(guest.tableId, guest.seatId);
       prepareTableActions(guest.tableId);
       setStatus('Место найдено.');
@@ -167,7 +176,7 @@ if (app) {
       if (error.name !== 'AbortError') setStatus(error.message === 'SEAT_NOT_ON_MAP' ? 'Место из таблицы не найдено на карте. Проверьте seat_id.' : 'Не удалось найти место. Проверьте имя или напишите организатору.');
     }
   };
-  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(searchGuests, 350); });
+  input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(searchGuests, 220); });
   input.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       if (!items.length) return;
