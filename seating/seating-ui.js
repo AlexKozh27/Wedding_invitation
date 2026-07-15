@@ -205,6 +205,21 @@ if (app) {
       guestsButton.textContent = `Показать гостей за столом ${selectedTableId}`;
     }
   });
-  // "Показать весь зал" changes only the scale: the selected guest stays visible.
-  resetButton.addEventListener('click', () => { map.showFullLayout(); setStatus('Показан весь зал; ваше место выделено.'); });
+  // Reset returns the entire seating section to its initial, unselected state.
+  resetButton.addEventListener('click', () => {
+    if (searchController) searchController.abort();
+    if (seatController) seatController.abort();
+    if (tableController) tableController.abort();
+    input.value = '';
+    items = [];
+    closeSuggestions();
+    result.hidden = true;
+    tableActions.hidden = true;
+    tableGuests.hidden = true;
+    tableGuests.replaceChildren();
+    selectedTableId = undefined;
+    map.resetMap();
+    resetButton.hidden = true;
+    setStatus('');
+  });
 }

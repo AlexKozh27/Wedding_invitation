@@ -45,8 +45,9 @@ export const seatingLayout = {
       // The first lower chair forms a pair with T1-S-16 at the joint.
       newlyweds: { 10: 'Место молодожёнов' }
     })),
-    // Vertical continuation at the right edge. The two parts have no chairs at their shared seam.
-    table('T3', 740, 190, 110, 245, verticalSeats('T3', 740, 190, 110, 245, { top: 1, left: 7, right: 7 })),
-    table('T4', 740, 435, 110, 245, verticalSeats('T4', 740, 435, 110, 245, { left: 7, right: 7 }))
+    // T3 is the lower vertical segment. Its entire short edge touches the top
+    // edge of T2; T4 continues it upward. Their shared seam has no chairs.
+    table('T3', 630, 435, 110, 245, verticalSeats('T3', 630, 435, 110, 245, { left: 7, right: 7 })),
+    table('T4', 630, 190, 110, 245, verticalSeats('T4', 630, 190, 110, 245, { top: 1, left: 7, right: 7 }))
   ]
 };
