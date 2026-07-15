@@ -81,6 +81,7 @@ if (app) {
     resultPlace.textContent = place;
     result.hidden = false;
   };
+  const formatGuestName = (guest) => guest.hint ? `${guest.displayName} — ${guest.hint}` : guest.displayName;
   const selectTableOnMap = (tableId, seatId) => {
     if (!map.highlightSelection(tableId, seatId)) throw new Error('LAYOUT_NOT_FOUND');
     if (!map.focusSelection(tableId, seatId)) throw new Error(seatId ? 'SEAT_NOT_ON_MAP' : 'LAYOUT_NOT_FOUND');
@@ -108,7 +109,7 @@ if (app) {
     }
     if (seatCache.has(seatId)) {
       const guest = seatCache.get(seatId);
-      showResult(guest.displayName, `Стол: ${guest.tableId}. Место: ${guest.seatId}.`);
+      showResult(formatGuestName(guest), `Стол: ${guest.tableId}. Место: ${guest.seatId}.`);
       setStatus('Гость найден.');
       return;
     }
@@ -177,7 +178,7 @@ if (app) {
       if (!data?.ok || !data.guest?.tableId) throw new Error(data?.code || 'GUEST_NOT_FOUND');
       const guest = data.guest;
       if (guest.seatId) seatCache.set(guest.seatId, guest);
-      showResult(guest.displayName, guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
+      showResult(formatGuestName(guest), guest.seatId ? `Стол: ${guest.tableId}. Место: ${guest.seatId}.` : `Ваш стол: ${guest.tableId}. Точное место будет указано позднее.`);
       selectTableOnMap(guest.tableId, guest.seatId);
       prepareTableActions(guest.tableId);
       setStatus('Место найдено.');
@@ -209,7 +210,7 @@ if (app) {
       const list = document.createElement('ul');
       list.className = 'seating-guests-list';
       data.items.forEach((guest) => {
-        if (guest.seatId) seatCache.set(guest.seatId, { displayName: guest.displayName, tableId: requestedTableId, seatId: guest.seatId });
+        if (guest.seatId) seatCache.set(guest.seatId, { displayName: guest.displayName, hint: guest.hint || '', tableId: requestedTableId, seatId: guest.seatId });
         const item = document.createElement('li');
         item.textContent = guest.seatId ? `${guest.displayName} — ${guest.seatId}` : guest.displayName;
         list.append(item);

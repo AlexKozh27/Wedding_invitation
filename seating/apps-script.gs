@@ -35,7 +35,7 @@ function searchGuests_(query) {
 function getSeat_(guestId) {
   try {
     const guest = guests_().find(g => g.guest_id === String(guestId || ''));
-    return guest ? { ok: true, guest: { displayName: guest.display_name, tableId: guest.table_id, seatId: guest.seat_id || null } } : { ok: false, code: 'GUEST_NOT_FOUND' };
+    return guest ? { ok: true, guest: { displayName: guest.display_name, hint: guest.public_hint || '', tableId: guest.table_id, seatId: guest.seat_id || null } } : { ok: false, code: 'GUEST_NOT_FOUND' };
   } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
 }
 // These two actions intentionally make the seating visible on the public map.
@@ -46,7 +46,7 @@ function getGuestsByTable_(tableId) {
   try {
     const items = guests_().filter(g => g.table_id === id)
       .sort((a, b) => String(a.seat_id).localeCompare(String(b.seat_id)))
-      .map(g => ({ displayName: g.display_name, seatId: g.seat_id || null }));
+      .map(g => ({ displayName: g.display_name, hint: g.public_hint || '', seatId: g.seat_id || null }));
     return { ok: true, items };
   } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
 }
@@ -55,6 +55,6 @@ function getGuestBySeat_(seatId) {
   if (!/^S-(?:0[1-9]|[12]\d|3[0-9])$/.test(id)) return { ok: false, code: 'BAD_REQUEST' };
   try {
     const guest = guests_().find(g => g.seat_id === id);
-    return guest ? { ok: true, guest: { displayName: guest.display_name, tableId: guest.table_id, seatId: guest.seat_id } } : { ok: false, code: 'GUEST_NOT_FOUND' };
+    return guest ? { ok: true, guest: { displayName: guest.display_name, hint: guest.public_hint || '', tableId: guest.table_id, seatId: guest.seat_id } } : { ok: false, code: 'GUEST_NOT_FOUND' };
   } catch (error) { console.error(error); return { ok: false, code: 'TEMPORARY_ERROR' }; }
 }
